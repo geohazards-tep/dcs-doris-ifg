@@ -8,24 +8,24 @@ function assert() {
  return $retval
 }
 
-touch settings.set
+master="$1"
+slave="$2"
+mlea="$3"
+slea="$4"
+steps="$5"
 
-#master="$2"
-#slave="$3"
+#master="/tmp/TSX/TDX1_SAR__SSC______SM_S_SRA_20140212T164857_20140212T164905/IMAGEDATA/IMAGE_HH_SRA_strip_006.cos"
+#slave="/tmp/TSX/TDX1_SAR__SSC______SM_S_SRA_20140201T164858_20140201T164906/IMAGEDATA/IMAGE_HH_SRA_strip_006.cos"
 
-master="/tmp/TSX/TDX1_SAR__SSC______SM_S_SRA_20140212T164857_20140212T164905/IMAGEDATA/IMAGE_HH_SRA_strip_006.cos"
-slave="/tmp/TSX/TDX1_SAR__SSC______SM_S_SRA_20140201T164858_20140201T164906/IMAGEDATA/IMAGE_HH_SRA_strip_006.cos"
+#master="./data/20140212/IMAGE_HH_SRA_strip_007.cos"
+#slave="./data/20140201/IMAGE_HH_SRA_strip_006.cos"
 
-master="./data/20140212/IMAGE_HH_SRA_strip_007.cos"
-slave="./data/20140201/IMAGE_HH_SRA_strip_006.cos"
+#mlea="TDX1_SAR__SSC______SM_S_SRA_20140212T164857_20140212T164905.xml"
+#slea="TDX1_SAR__SSC______SM_S_SRA_20140201T164858_20140201T164906.xml"
 
-mlea="TDX1_SAR__SSC______SM_S_SRA_20140212T164857_20140212T164905.xml"
-slea="TDX1_SAR__SSC______SM_S_SRA_20140201T164858_20140201T164906.xml"
+#mlea="./data/20140212/TDX1_SAR__SSC______SM_S_SRA_20140212T164857_20140212T164905.xml"
+#slea="./data/20140201/TDX1_SAR__SSC______SM_S_SRA_20140201T164858_20140201T164906.xml"
 
-mlea="./data/20140212/TDX1_SAR__SSC______SM_S_SRA_20140212T164857_20140212T164905.xml"
-slea="./data/20140201/TDX1_SAR__SSC______SM_S_SRA_20140201T164858_20140201T164906.xml"
-
-settings apply -r m_orbdir="$orbdir"
 settings apply -r m_in_method="TSX"
 settings apply -r s_in_method="TSX"
 settings apply dataFile="IMAGE*"
@@ -35,11 +35,11 @@ settings apply m_in_lea="$mlea"
 settings apply s_in_lea="$slea"
 settings apply master="${master##*/}"
 settings apply slave="${slave##*/}"
-settings apply projectFolder="/home/fbrito/wtsx"
+settings apply projectFolder="$PWD"
 settings apply -r raster_format=png
 settings save adoretsx.set
 
-cat ../tsx.steps | while read step
+cat $steps | while read step
 do
   bold "processing $step"
   eval "$step"
@@ -52,86 +52,3 @@ do
 done
 
 return 0
-
-bold "Reading master"
-m_readfiles
-
-assert $? "m_readfiles"
-return $?
-
-bold "Reading slave"
-s_readfiles
-
-assert $? "s_readfiles"
-return $?
-
-# patch .res TDX-1 to TSX-1
-sed -i 's#\(.*\)\(TDX-1\)$#\1TSX-1#g' `basename $master`.res
-sed -i 's#\(.*\)\(TDX-1\)$#\1TSX-1#g' `basename $slave`.res
-
-m_crop
-
-assert $? "m_crop"
-return $?
-
-s_crop
-
-return 0
-
-coarseorb
-
-dem make SRTM3 50 thedem
-
-raster a m_crop -- -M1/5
-
-raster a s_crop -- -M1/5
-
-m_simamp
-
-m_timing
-
-coarsecorr
-
-fine
-
-reltiming
-
-demassist
-
-coregpm
-
-resample
-
-interfero
-
-comprefpha
-
-subtrrefpha
-
-comprefdem
-
-subtrrefdem
-
-coherence
-
-unwrap
-
-slant2h
-
-geocode
-
-raster p subtrrefdem -- -M4/4
-
-raster p subtrrefpha -- -M4/4
-
-raster p interfero -- -M4/4
-
-raster p coherence -- -M4/4 -cgray -b
-
-saveas gdal p subtrrefdem -of GTiff ${master##*/}_${slave##*/}_srd.tiff
-
-saveas gdal p subtrrefpha -of GTiff ${master##*/}_${slave##*/}_srp.tiff
-
-Saveas gdal p interfero -of GTiff ${master##*/}_${slave##*/}_cint.tiff
-
-saveas gdal p coherence -of GTiff ${master##*/}_${slave##*/}_coh.tiff
