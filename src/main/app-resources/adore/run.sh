@@ -55,11 +55,11 @@ ciop-log "INFO" "Extract lea and vol"
 mkdir -p $TMPDIR/process
 cd $TMPDIR/process
 # extract the vol and lea from the archive
-$_CIOP_APPLICATION_PATH/adore/bin/extract_tsx.sh $master $slave
+paths="`$_CIOP_APPLICATION_PATH/adore/bin/extract_tsx.sh $master $slave`"
 [ $? -ne 0 ] && exit $ERR_EXTRACT
 
 ciop-log "INFO" "Launching adore for TSX"
-adore -p $_CIOP_APPLICATION_PATH/adore/libexec/coseismic_tsx.adr $_CIOP_APPLICATION_PATH/adore/etc/tsx.steps
+adore -p $_CIOP_APPLICATION_PATH/adore/libexec/coseismic_tsx.adr $paths $_CIOP_APPLICATION_PATH/adore/etc/tsx.steps
 
 [ $? -ne 0 ] && exit $ERR_ADORE
 
