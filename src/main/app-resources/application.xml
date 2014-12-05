@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="tsx-adore">
+  <jobTemplates>
+    <jobTemplate id="adore">
+      <streamingExecutable>/application/adore/run.sh</streamingExecutable>
+      <defaultParameters>
+        <parameter id="master" title="TerraSAR-X master product reference" abstract="Define the master TerraSAR-X product reference to use with ADORE" scope="runtime" />
+      </defaultParameters>
+      <defaultJobconf>
+      	<property id="ciop.job.max.tasks">1</property>
+        <property id="mapred.task.timeout">9900000000</property>
+      </defaultJobconf>
+    </jobTemplate>
+  </jobTemplates>
+  <workflow id="adore_wf" title="TerraSAR-X processing with ADORE DORIS" abstract="TerraSAR-X processing with ADORE DORIS">
+    <workflowVersion>1.0</workflowVersion>
+    <node id="node_adore">
+      <job id="adore" />
+      <sources>
+        <source scope="runtime" id="slave" title="TerraSAR-X slave product reference" abstract="Define the slave TerraSAR-X product reference to use with ADORE" refid="string:list"></source>
+      </sources>
+      </parameters>
+    </node>
+  </workflow>
+</application>
