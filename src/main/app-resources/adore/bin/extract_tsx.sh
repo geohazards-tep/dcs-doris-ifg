@@ -6,7 +6,8 @@ slave=$2
 function extract() {
 
   local archive=$1
-
+  local target=$2
+  
   # get the archive contents
   tar tfz $archive > tar.list
 
@@ -19,7 +20,7 @@ function extract() {
   tar -zxvf $archive $lea --strip-components $depth
 
   # get the dataset date
-  folder=`cat $baselea | xsltproc tsx.xsl - | date '+%Y%m%d'`
+  folder=${target}_`cat $baselea | xsltproc tsx.xsl - | date '+%Y%m%d'`
 
   # create the data folder
   mkdir -p data/$folder
@@ -37,14 +38,14 @@ function extract() {
   rm -f tar.list
 }
 
-extract $master
+extract $master master
 
-extract $slave
+extract $slave slave
 
 # check if cos have the same name, DORIS doesn't like it
 [ "`find data -name "*.cos" | xargs -I {} basename {} | sort -u | wc -l`" == "1" ] && {
   # rename the slave
-  slave="`find date -name "*.cos" | tail -n 1`"
+  slave="`find data -name "slave_*/*.cos"`"
   newslave="`echo "$slave" | sed "s#\(.*_\)\([0-9].*\)\(\.cos\)#\1$( printf %03d $( echo "$( basename "$slave" | sed 's#.*_\(.*\)\.cos#\1#g' ) + 1" | bc ) )\3#g"`"
   mv $slave $newslave
 }
