@@ -14,8 +14,8 @@ ERR_PUBLISH=50
 # add a trap to exit gracefully
 function cleanExit ()
 {
-	local retval=$?
-	local msg=""
+  local retval=$?
+  local msg=""
 	
   case "$retval" in
 		$SUCCESS) msg="Processing successfully concluded";;
@@ -44,11 +44,11 @@ master_ref="`ciop-getparam master`"
 slave_ref="`cat`"
 
 ciop-log "INFO" "Retrieving master"
-master="`echo $master_ref | ciop-copy -O $TMPDIR -`"
+master="`echo $master_ref | ciop-copy -U -O $TMPDIR -`"
 [ $? -ne 0 ] && exit $ERR_MASTER
 
 ciop-log "INFO" "Retrieving slave"
-slave="`echo $slave_ref | ciop-copy -O $TMPDIR -`"
+slave="`echo $slave_ref | ciop-copy -U -O $TMPDIR -`"
 [ $? -ne 0 ] && exit $ERR_SLAVE
 
 ciop-log "INFO" "Extract lea and vol"
@@ -68,7 +68,7 @@ res=$?
 ciop-publish -m $TMPDIR/process/*.tiff
 res=`echo "$res + $?" | bc`
 
-[ $? -ne 0 ] && exit $ERR_PUBLISH
+[ $res -ne 0 ] && exit $ERR_PUBLISH
  
 rm -rf $TMPDIR
 
