@@ -8,11 +8,17 @@ function assert() {
  return $retval
 }
 
-master="$1"
-slave="$2"
-mlea="$3"
-slea="$4"
-steps="$5"
+master=${1}
+slave=${2}
+mlea=${3}
+slea=${4}
+steps=${5}
+
+bold "master: $master"
+bold "slave: $slave"
+bold "mlea: $mlea"
+bold "slea: $slea"
+bold "steps: $steps"
 
 #master="/tmp/TSX/TDX1_SAR__SSC______SM_S_SRA_20140212T164857_20140212T164905/IMAGEDATA/IMAGE_HH_SRA_strip_006.cos"
 #slave="/tmp/TSX/TDX1_SAR__SSC______SM_S_SRA_20140201T164858_20140201T164906/IMAGEDATA/IMAGE_HH_SRA_strip_006.cos"
