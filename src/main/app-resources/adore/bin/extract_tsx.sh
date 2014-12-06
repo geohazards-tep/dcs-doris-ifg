@@ -20,7 +20,7 @@ function extract() {
   tar -zxvf $archive $lea --strip-components $depth
 
   # get the dataset date
-  folder=${target}_`cat $baselea | xsltproc tsx.xsl - | date '+%Y%m%d'`
+  folder=${target}_`cat $baselea | xsltproc $0/../etc/tsx2date.xsl - | date '+%Y%m%d'`
 
   # create the data folder
   mkdir -p data/$folder
