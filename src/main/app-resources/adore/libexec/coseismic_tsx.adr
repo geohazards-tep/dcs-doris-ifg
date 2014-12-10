@@ -62,7 +62,7 @@ cat $steps | while read step
 do
   ciop-log "INFO" "processing $step"
   shout "INFO" "processing $step"
-  eval "$step" &> p_`echo $step | tr " " "_"`.log
+  [ ${step:0:1} != "#" ] && eval "$step" &> p_`echo $step | tr " " "_"`.log
   assert $? "$step"
   res="$?" 
   [ "$res" != "0" ] && return $res
