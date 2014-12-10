@@ -12,14 +12,14 @@
       </defaultJobconf>
     </jobTemplate>
   </jobTemplates>
-  <workflow id="adore_wf" title="TerraSAR-X processing with ADORE DORIS" abstract="TerraSAR-X processing with ADORE DORIS">
+  <workflow id="dcs-doris-tsx" title="TerraSAR-X processing with ADORE DORIS" abstract="TerraSAR-X processing with ADORE DORIS">
     <workflowVersion>1.0</workflowVersion>
     <node id="node_adore">
       <job id="adore" />
       <sources>
         <source scope="runtime" id="slave" title="TerraSAR-X slave product reference" abstract="Define the slave TerraSAR-X product reference to use with ADORE" refid="string:list">s3://terrasar-x/2014/02/TSX_20140201T164858.314_Etna_C221_O055_A_R_SM006_SSC.tar.gz</source>
       </sources>
-      </parameters>
+      <parameters/>
     </node>
   </workflow>
 </application>

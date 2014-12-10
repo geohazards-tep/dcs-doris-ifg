@@ -3,7 +3,7 @@ s_readfiles
 m_crop
 s_crop
 coarseorb
-dem make SRTM3 50 default
+dem make SRTM3 200 default
 m_simamp
 m_timing
 coarsecorr

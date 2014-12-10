@@ -28,7 +28,7 @@ $ERR_EXTRACT) msg="Failed to retrieve the extract the vol and lea";;
   esac
 
   [ "$retval" != "0" ] && ciop-log "ERROR" "Error $retval - $msg, processing aborted" || ciop-log "INFO" "$msg"
-  rm -rf $TMPDIR	
+#  rm -rf $TMPDIR	
   exit $retval
 }
 trap cleanExit EXIT
@@ -58,6 +58,11 @@ cd $TMPDIR/process
 $_CIOP_APPLICATION_PATH/adore/bin/extract_tsx.sh $master $slave
 [ $? -ne 0 ] && exit $ERR_EXTRACT
 
+# free up some space
+ciop-log "DEBUG" "`du -hcs $TMPDIR`"
+rm -f $master $slave
+ciop-log "DEBUG" "`du -hcs $TMPDIR`"
+
 dm="`find data -type d -name "master*"`"
 mvol="`find $dm -name "*.cos"`"
 mlea="`find $dm -name "*.xml"`"
@@ -67,6 +72,8 @@ svol="`find $sm -name "*.cos"`"
 slea="`find $sm -name "*.xml"`"
 
 ciop-log "INFO" "Launching adore for TSX"
+export ADORESCR=/opt/adore/scr
+export PATH=/usr/local/bin:/opt/adore/scr:$PATH
 adore "p $_CIOP_APPLICATION_PATH/adore/libexec/coseismic_tsx.adr $mvol $svol $mlea $slea $_CIOP_APPLICATION_PATH/adore/etc/tsx.steps"
 
 [ $? -ne 0 ] && exit $ERR_ADORE
@@ -78,6 +85,4 @@ res=`echo "$res + $?" | bc`
 
 [ $res -ne 0 ] && exit $ERR_PUBLISH
  
-rm -rf $TMPDIR
-
 ciop-log "INFO" "Done"

@@ -1,5 +1,18 @@
 ERR_M_READFILES=10
 
+function now()
+{
+        echo "`date +%Y-%m-%dT%H:%M:%S`"
+}
+
+function shout()
+{
+  type -t ciop-log
+  [ "$?" == "0" ] && ciop-log ${1} ${2} || bold "${1} ${2}"
+
+}
+
+
 function assert() {
 
  local retval=$1
@@ -32,23 +45,24 @@ bold "steps: $steps"
 #mlea="./data/20140212/TDX1_SAR__SSC______SM_S_SRA_20140212T164857_20140212T164905.xml"
 #slea="./data/20140201/TDX1_SAR__SSC______SM_S_SRA_20140201T164858_20140201T164906.xml"
 
-settings apply -r m_in_method="TSX"
-settings apply -r s_in_method="TSX"
-settings apply dataFile="IMAGE*"
-settings apply m_in_dat="$master" 
-settings apply s_in_dat="$slave"
-settings apply m_in_lea="$mlea"
-settings apply s_in_lea="$slea"
-settings apply master="${master##*/}"
-settings apply slave="${slave##*/}"
-settings apply projectFolder="$PWD"
-settings apply -r raster_format=png
+settings apply -q -r m_in_method="TSX"
+settings apply -q r s_in_method="TSX"
+settings apply -q dataFile="IMAGE*"
+settings apply -q m_in_dat="$master" 
+settings apply -q s_in_dat="$slave"
+settings apply -q m_in_lea="$mlea"
+settings apply -q s_in_lea="$slea"
+settings apply -q master="${master##*/}"
+settings apply -q slave="${slave##*/}"
+settings apply -q projectFolder="$PWD"
+settings apply -q -r raster_format=png
 settings save adoretsx.set
 
 cat $steps | while read step
 do
-  bold "processing $step"
-  eval "$step"
+  ciop-log "INFO" "processing $step"
+  shout "INFO" "processing $step"
+  eval "$step" &> p_`echo $step | tr " " "_"`.log
   assert $? "$step"
   res="$?" 
   [ "$res" != "0" ] && return $res
