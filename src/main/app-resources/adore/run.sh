@@ -59,9 +59,7 @@ $_CIOP_APPLICATION_PATH/adore/bin/extract_tsx.sh $master $slave
 [ $? -ne 0 ] && exit $ERR_EXTRACT
 
 # free up some space
-ciop-log "DEBUG" "`du -hcs $TMPDIR`"
 rm -f $master $slave
-ciop-log "DEBUG" "`du -hcs $TMPDIR`"
 
 dm="`find data -type d -name "master*"`"
 mvol="`find $dm -name "*.cos"`"
@@ -74,14 +72,12 @@ slea="`find $sm -name "*.xml"`"
 ciop-log "INFO" "Launching adore for TSX"
 export ADORESCR=/opt/adore/scr
 export PATH=/usr/local/bin:/opt/adore/scr:$PATH
-adore "p $_CIOP_APPLICATION_PATH/adore/libexec/coseismic_tsx.adr $mvol $svol $mlea $slea $_CIOP_APPLICATION_PATH/adore/etc/tsx.steps"
+adore "p $_CIOP_APPLICATION_PATH/adore/libexec/ifg.adr $mvol $svol $mlea $slea $_CIOP_APPLICATION_PATH/adore/etc/tsx.steps"
 
 [ $? -ne 0 ] && exit $ERR_ADORE
 
-ciop-publish -m $TMPDIR/process/*.png
+ciop-publish -m $TMPDIR/process/*.int
 res=$?
-ciop-publish -m $TMPDIR/process/*.tiff
-res=`echo "$res + $?" | bc`
 
 [ $res -ne 0 ] && exit $ERR_PUBLISH
  
