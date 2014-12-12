@@ -63,7 +63,11 @@ Run this command in a shell:
 ```bash
 ciop-simwf
 ```
-Or invoke the Web Processing Service via the Sandbox dashboard or the [Geohazards Thematic Exploitation platform](https://geohazards-tep.eo.esa.int) providing a master/slave product URL. 
+Or invoke the Web Processing Service via the Sandbox dashboard or the [Geohazards Thematic Exploitation platform](https://geohazards-tep.eo.esa.int) providing a master/slave product URL and optionally set Doris input cards values e.g.:
+
+```
+m_dbow_geo="37.755 14.995 12200 12200",rs_dbow_geo="37.755 14.995 12000 12000",cc_winsize="128 128",fc_acc="8 8",int_multilook="1 1",coh_multilook="1 1",dumpbaseline="15 10"
+```
 
 ### <a name="community"></a>Community and Documentation
 
@@ -88,3 +92,5 @@ Please file any bugs or questions as [issues](https://github.com/geohazards-tep/
 Copyright 2014 Terradue Srl
 
 Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+
+> This work has been co-funded by the EC FP7 project MED-SUV Grant agreement 308665 
