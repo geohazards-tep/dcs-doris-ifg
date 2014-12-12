@@ -30,6 +30,15 @@ shout "INFO" "mlea: $mlea"
 shout "INFO" "slea: $slea"
 shout "INFO" "steps: $steps"
 
+# experimental (lat lon)
+settings apply -r m_dbow_geo="37.755 14.995 2200 2200"
+settings apply -r rs_dbow_geo="37.755 14.995 2000 2000"
+settings apply -r cc_winsize="128 128"
+settings apply -r fc_acc="8 8"
+settings apply -r int_multilook="1 1"
+settings apply -r coh_multilook="1 1"
+settings apply -r dumpbaseline="15 10"
+
 settings apply -q -r m_in_method="TSX"
 settings apply -q r s_in_method="TSX"
 settings apply -q dataFile="IMAGE*"

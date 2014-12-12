@@ -9,7 +9,8 @@ ERR_MASTER=10
 ERR_SLAVE=20
 ERR_EXTRACT=30
 ERR_ADORE=40
-ERR_PUBLISH=50
+ERR_PUBLISH_RES=50
+ERR_PUBLISH_PNG=60
 
 # add a trap to exit gracefully
 function cleanExit ()
@@ -23,7 +24,8 @@ function cleanExit ()
      $ERR_SLAVE) msg="Failed to retrieve the slave product";;
 $ERR_EXTRACT) msg="Failed to retrieve the extract the vol and lea";;
 		$ERR_ADORE) msg="Failed during ADORE execution";;
-		$ERR_PUBLISH) msg="Failed results publish";;
+		$ERR_PUBLISH_RES) msg="Failed results publish";;
+		$ERR_PUBLISH_PNG) msg="Failed results publish quicklooks";;
 		*) msg="Unknown error";;
   esac
 
@@ -78,7 +80,11 @@ adore "p $_CIOP_APPLICATION_PATH/adore/libexec/ifg.adr $mvol $svol $mlea $slea $
 
 ciop-publish -m $TMPDIR/process/*.int
 res=$?
+[ $res -ne 0 ] && exit $ERR_PUBLISH_RES
 
-[ $res -ne 0 ] && exit $ERR_PUBLISH
+# publish the quicklooks
+ciop-publish -m $TMPDIR/process/*.png
+res=$?
+[ $res -ne 0 ] && exit $ERR_PUBLISH_PNG
  
 ciop-log "INFO" "Done"
