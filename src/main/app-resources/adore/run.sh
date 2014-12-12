@@ -41,6 +41,14 @@ TMPDIR="/tmp/`uuidgen`"
 # creates the adore directory structure
 ciop-log "INFO" "creating the directory structure"
 mkdir -p $TMPDIR
+mkdir -p $TMPDIR/process
+cd $TMPDIR/process
+
+settings="`ciop-getparam settings`"
+ciop-log "INFO" "Additional settings for adore: $settings"
+
+echo "$settings" | tr "," "\n" | sed 's/^/settings apply -r -q /' > $TMPDIR/process/settings
+
 
 master_ref="`ciop-getparam master`"
 slave_ref="`cat`"
@@ -54,8 +62,7 @@ slave="`echo $slave_ref | ciop-copy -U -O $TMPDIR -`"
 [ $? -ne 0 ] && exit $ERR_SLAVE
 
 ciop-log "INFO" "Extract lea and vol"
-mkdir -p $TMPDIR/process
-cd $TMPDIR/process
+
 # extract the vol and lea from the archive
 $_CIOP_APPLICATION_PATH/adore/bin/extract_tsx.sh $master $slave
 [ $? -ne 0 ] && exit $ERR_EXTRACT
@@ -81,6 +88,8 @@ adore "p $_CIOP_APPLICATION_PATH/adore/libexec/ifg.adr $mvol $svol $mlea $slea $
 ciop-publish -m $TMPDIR/process/*.int
 res=$?
 [ $res -ne 0 ] && exit $ERR_PUBLISH_RES
+
+ciop-publish -m $TMPDIR/process/adoretsx.list
 
 # publish the quicklooks
 ciop-publish -m $TMPDIR/process/*.png

@@ -5,6 +5,7 @@
       <streamingExecutable>/application/adore/run.sh</streamingExecutable>
       <defaultParameters>
         <parameter id="master" title="TerraSAR-X master product reference" abstract="Define the master TerraSAR-X product reference to use with ADORE" scope="runtime">s3://terrasar-x/2014/02/TSX_20140212T164857.921_Etna_C222_O055_A_R_SM006_SSC.tar.gz</parameter>
+        <parameter id="settings" title="Settings for ADORE Doris separated by comma" abstract="Settings for ADORE Doris separated by comma" scope="runtime">m_dbow_geo="37.755 14.995 12200 12200",rs_dbow_geo="37.755 14.995 12000 12000",cc_winsize="128 128",fc_acc="8 8",int_multilook="1 1",coh_multilook="1 1",dumpbaseline="15 10"</parameter>
       </defaultParameters>
       <defaultJobconf>
       	<property id="ciop.job.max.tasks">1</property>

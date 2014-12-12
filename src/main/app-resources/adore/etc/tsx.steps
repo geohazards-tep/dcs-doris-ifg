@@ -22,10 +22,10 @@ coherence
 unwrap
 slant2h
 geocode
-raster p subtrrefdem -M5/1
-raster p subtrrefpha -M5/1
-raster p interfero -M5/1
-raster p coherence -M5/1 -cgray -b
+raster p subtrrefdem $multilook_factor
+raster p subtrrefpha $multilook_factor
+raster p interfero $multilook_factor
+raster p coherence $multilook_factor -cgray -b
 #saveas gdal p subtrrefdem -of GTiff master__srd.tiff
 #saveas gdal p subtrrefpha -of GTiff master__srp.tiff
 #saveas gdal p interfero -of GTiff master__cint.tiff
