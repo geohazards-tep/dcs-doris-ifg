@@ -33,6 +33,7 @@ Downgrade *geos* and install python-lxml:
 ```bash
 sudo yum -y downgrade geos-3.3.2
 sudo yum -y install python-lxml
+sudo yum -y install snaphu
 ```
 
 ##### Using the releases
