@@ -47,7 +47,7 @@ shout "INFO" "steps: $steps"
 }
 
 settings apply -q -r m_in_method="TSX"
-settings apply -q r s_in_method="TSX"
+settings apply -q -r s_in_method="TSX"
 settings apply -q dataFile="IMAGE*"
 settings apply -q m_in_dat="$master" 
 settings apply -q s_in_dat="$slave"
