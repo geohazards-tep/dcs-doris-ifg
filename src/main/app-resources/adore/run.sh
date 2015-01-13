@@ -16,22 +16,24 @@ ERR_PUBLISH_PNG=60
 cleanExit () { 
 
   local retval=$?
-  local msg=""
+  local msg
+  msg=""
 	
-  case "$retval" in
-    $SUCCESS) msg="Processing successfully concluded";;
-		$ERR_MASTER) msg="Failed to retrieve the master product";;
-    $ERR_SLAVE) msg="Failed to retrieve the slave product";;
-    $ERR_EXTRACT) msg="Failed to retrieve the extract the vol and lea";;
-		$ERR_ADORE) msg="Failed during ADORE execution";;
-		$ERR_PUBLISH_RES) msg="Failed results publish";;
-		$ERR_PUBLISH_PNG) msg="Failed results publish quicklooks";;
+  case "${retval}" in
+    ${SUCCESS}) msg="Processing successfully concluded";;
+		${ERR_MASTER}) msg="Failed to retrieve the master product";;
+    ${ERR_SLAVE}) msg="Failed to retrieve the slave product";;
+    ${ERR_EXTRACT}) msg="Failed to retrieve the extract the vol and lea";;
+		${ERR_ADORE}) msg="Failed during ADORE execution";;
+		${ERR_PUBLISH_RES}) msg="Failed results publish";;
+		${ERR_PUBLISH_PNG}) msg="Failed results publish quicklooks";;
 		*) msg="Unknown error";;
   esac
 
-  [ "$retval" != "0" ] && ciop-log "ERROR" "Error $retval - $msg, processing aborted" || ciop-log "INFO" "$msg"
+  [ "${retval}" != "0" ] && ciop-log "ERROR" \
+    "Error ${retval} - ${msg}, processing aborted" || ciop-log "INFO" "${msg}"
 #  rm -rf $TMPDIR	
-  exit $retval
+  exit ${retval}
 }
 trap cleanExit EXIT
 
@@ -45,14 +47,14 @@ set_env() {
   # shorter temp path 
   export TMPDIR=/tmp/$( uuidgen )
   mkdir -p ${TMPDIR}/process
-  
-
   return $?
 }
 
 set_app_pars() {
   settings="$( ciop-getparam settings )"
-  [ ! -z "${settings}" ] && echo "${settings}" | tr "," "\n" | sed 's/^/settings apply -r -q /' > ${TMPDIR}/process/settings.app
+  [ ! -z "${settings}" ] && echo "${settings}" \
+    | tr "," "\n" \
+    | sed 's/^/settings apply -r -q /' > ${TMPDIR}/process/settings.app
 }
 
 get_data() {
@@ -94,7 +96,8 @@ main() {
 
   ciop-log "INFO" "Launching adore for ${mission}"
   cd $TMPDIR/process
-  adore "p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps"  
+  adore p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr \
+    ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps 
   [ $? -ne 0 ] && return ${ERR_ADORE}
 
   ciop-publish -m ${TMPDIR}/process/*.int
