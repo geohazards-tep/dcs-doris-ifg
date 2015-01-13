@@ -47,7 +47,7 @@ cd $TMPDIR/process
 settings="`ciop-getparam settings`"
 ciop-log "INFO" "Additional settings for adore: $settings"
 
-echo "$settings" | tr "," "\n" | sed 's/^/settings apply -r -q /' > $TMPDIR/process/settings
+echo "$settings" | tr "," "\n" | sed 's/^/settings apply -r -q /' > $TMPDIR/process/settings.app
 
 
 master_ref="`ciop-getparam master`"
@@ -61,27 +61,20 @@ ciop-log "INFO" "Retrieving slave"
 slave="`echo $slave_ref | ciop-copy -U -O $TMPDIR -`"
 [ $? -ne 0 ] && exit $ERR_SLAVE
 
-ciop-log "INFO" "Extract lea and vol"
+ciop-log "INFO" "Create environment for Adore" 
+export SAR_HELPERS_HOME=/opt/sar-helpers/lib/
+. ${SAR_HELPERS_HOME}/sar-helpers.sh
 
-# extract the vol and lea from the archive
-$_CIOP_APPLICATION_PATH/adore/bin/extract_tsx.sh $master $slave
+create_env_adore ${master} ${slave} $TMPDIR/process
 [ $? -ne 0 ] && exit $ERR_EXTRACT
 
-# free up some space
-rm -f $master $slave
-
-dm="`find data -type d -name "master*"`"
-mvol="`find $dm -name "*.cos"`"
-mlea="`find $dm -name "*.xml"`"
-
-sm="`find data -type d -name "slave*"`"
-svol="`find $sm -name "*.cos"`"
-slea="`find $sm -name "*.xml"`"
+mission=$( get_mission $master | tr "A-Z" "a-z" )
 
 ciop-log "INFO" "Launching adore for TSX"
+cd $TMPDIR/process
 export ADORESCR=/opt/adore/scr
 export PATH=/usr/local/bin:/opt/adore/scr:$PATH
-adore "p $_CIOP_APPLICATION_PATH/adore/libexec/ifg.adr $mvol $svol $mlea $slea $_CIOP_APPLICATION_PATH/adore/etc/tsx.steps"
+adore "p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps"
 
 [ $? -ne 0 ] && exit $ERR_ADORE
 
@@ -95,5 +88,7 @@ ciop-publish -m $TMPDIR/process/adoretsx.list
 ciop-publish -m $TMPDIR/process/*.png
 res=$?
 [ $res -ne 0 ] && exit $ERR_PUBLISH_PNG
+
+ciop-publish -m $TMPDIR/*.log
  
 ciop-log "INFO" "Done"

@@ -4,15 +4,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.terradue.ciop.app</groupId>
-	<artifactId>dcs-doris-tsx</artifactId>
+	<artifactId>dcs-doris-ifg</artifactId>
 	<packaging>rpm</packaging>
-	<description>TerraSAR-X coseismic interferogram dcs application using ADORE DORIS</description>
+	<description>Interferogram dcs application using ADORE DORIS</description>
 	<version>0.1</version>
 
 	<scm>
-		<connection>scm:git:git@github.com:Terradue/dcs-doris-tsx.git</connection>
-		<developerConnection>scm:git:git@github.com:Terradue/dcs-doris-tsx.git</developerConnection>
-		<url>https://github.com/Terradue/dcs-doris-tsx</url>
+		<connection>scm:git:git@github.com:Terradue/dcs-doris-ifg.git</connection>
+		<developerConnection>scm:git:git@github.com:Terradue/dcs-doris-ifg.git</developerConnection>
+		<url>https://github.com/Terradue/dcs-doris-ifg</url>
 		<tag>HEAD</tag>
 	</scm>
 

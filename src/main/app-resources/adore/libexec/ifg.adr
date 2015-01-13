@@ -1,12 +1,12 @@
 function now() {
 
-  echo "`date +%Y-%m-%dT%H:%M:%S`"
+  date +%Y-%m-%dT%H:%M:%S
 }
 
 function shout() {
   [ -n "$3" ] && proc="$3" || proc="user process"
   echo "`now` [${1}     ][$proc] ${2}" >&2  
-  [ "$USER" == "mapred" ] && echo "reporter:status:`now` [${1}  ][${proc}] ${2}" >&2
+  [ "${USER}" == "mapred" ] && echo "reporter:status:$( now ) [${1}  ][${proc}] ${2}" >&2
 }
 
 
@@ -14,64 +14,52 @@ function assert() {
 
  local retval=$1
  local step=$2
- [ "$retval" != "0" ] && shout "ERROR" "Error $retval - $step, processing aborted" 
- return $retval
+ [ "${retval}" != "0" ] && shout "ERROR" "Error ${retval} - ${step}, processing aborted" 
+ return ${retval}
 }
 
-master=${1}
-slave=${2}
-mlea=${3}
-slea=${4}
-steps=${5}
+steps=${1}
 
-shout "INFO" "master: $master"
-shout "INFO" "slave: $slave"
-shout "INFO" "mlea: $mlea"
-shout "INFO" "slea: $slea"
-shout "INFO" "steps: $steps"
-
-# experimental (lat lon)
-#settings apply -r m_dbow_geo="37.755 14.995 2200 2200"
-#settings apply -r rs_dbow_geo="37.755 14.995 2000 2000"
-#settings apply -r cc_winsize="128 128"
-#settings apply -r fc_acc="8 8"
-#settings apply -r int_multilook="1 1"
-#settings apply -r coh_multilook="1 1"
-#settings apply -r dumpbaseline="15 10"
-
-[ -f "./settings" ] && {
+[ -f "./settings.app" ] && {
 
   shout "INFO" "Settings additional parameters"
-  . ./settings
+  . ./settings.app
 
 }
 
-settings apply -q -r m_in_method="TSX"
-settings apply -q -r s_in_method="TSX"
-settings apply -q dataFile="IMAGE*"
-settings apply -q m_in_dat="$master" 
-settings apply -q s_in_dat="$slave"
-settings apply -q m_in_lea="$mlea"
-settings apply -q s_in_lea="$slea"
-settings apply -q master="${master##*/}"
-settings apply -q slave="${slave##*/}"
-settings apply -q projectFolder="$PWD"
+[ -f "./settings.set" ] && {
+
+  shout "INFO" "Settings environment parameters"
+  . ./settings.set
+
+} || return 1
+
 settings apply -q -r raster_format=png
-settings save adoretsx.set
 
-settings list > adoretsx.list
+# ASAR needs orbit files
+[ ${m_in_method} == ASAR ] && {
+  mkdir ./aux
+  tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ODR.tgz -C ./aux
+  settings apply -r m_orbdir=./aux
+}
 
-export multilook_factor="`cat adoretsx.list | grep int_multilook | sed 's/int_multilook="//' | sed 's/"//' | tr " " "/" | sed 's/^/ -M/'`"
+# save the settings
+settings save adore.set
+settings list > adore.list
+export multilook_factor="`cat adore.list | grep int_multilook | sed 's/int_multilook="//' | sed 's/"//' | tr " " "/" | sed 's/^/ -M/'`"
 
-cat $steps | while read step
+
+cat ${steps} | while read step
 do
   shout "INFO" "processing $step"
   [ ${step:0:1} != "#" ] && eval "$step" &> ${step//[^a-zA-Z_0-9]/_}.log
-  assert $? "$step"
-  res="$?" 
-  [ "$res" != "0" ] && return $res
-  [ "$step" == "m_readfiles" ] && sed -i 's#\(.*\)\(TDX-1\)$#\1TSX-1#g' `basename $master`.res
-  [ "$step" == "s_readfiles" ] && sed -i 's#\(.*\)\(TDX-1\)$#\1TSX-1#g' `basename $slave`.res  
+  assert $? "${step}"
+  res=$? 
+  [ "${res}" != "0" ] && return ${res}
+  
+  # special handling for TSX
+  [ "${step}" == "m_readfiles" ] && [ ${m_in_method} == TSX ] && sed -i 's#\(.*\)\(TDX-1\)$#\1TSX-1#g' `basename ${master}`.res
+  [ "${step}" == "s_readfiles" ] && [ ${s_in_method} == TSX ] && sed -i 's#\(.*\)\(TDX-1\)$#\1TSX-1#g' `basename ${slave}`.res  
 
 done
 

@@ -4,8 +4,9 @@
     <jobTemplate id="adore">
       <streamingExecutable>/application/adore/run.sh</streamingExecutable>
       <defaultParameters>
-        <parameter id="master" title="TerraSAR-X master product reference" abstract="Define the master TerraSAR-X product reference to use with ADORE" scope="runtime">s3://terrasar-x/2014/02/TSX_20140212T164857.921_Etna_C222_O055_A_R_SM006_SSC.tar.gz</parameter>
-        <parameter id="settings" title="Settings for ADORE Doris separated by comma" abstract="Settings for ADORE Doris separated by comma" scope="runtime">m_dbow_geo="37.755 14.995 12200 12200",rs_dbow_geo="37.755 14.995 12000 12000",cc_winsize="128 128",fc_acc="8 8",int_multilook="1 1",coh_multilook="1 1",dumpbaseline="15 10"</parameter>
+        <!--<parameter id="master" title="TerraSAR-X master product reference" abstract="Define the master TerraSAR-X product reference to use with ADORE" scope="runtime">s3://terrasar-x/2014/02/TSX_20140212T164857.921_Etna_C222_O055_A_R_SM006_SSC.tar.gz</parameter>-->
+        <parameter id="master" title="" abstract="" scope="runtime">http://eo-virtual-archive4.esa.int/search/ASA_IMS_1P/ASA_IMS_1PNUPA20090201_092428_000000162076_00079_36205_2699.N1/rdf</parameter>
+        <!--<parameter id="settings" title="Settings for ADORE Doris separated by comma" abstract="Settings for ADORE Doris separated by comma" scope="runtime">m_dbow_geo="37.755 14.995 12200 12200",rs_dbow_geo="37.755 14.995 12000 12000",cc_winsize="128 128",fc_acc="8 8",int_multilook="5 1",coh_multilook="5 1",dumpbaseline="15 10"</parameter>-->
       </defaultParameters>
       <defaultJobconf>
       	<property id="ciop.job.max.tasks">1</property>
@@ -18,7 +19,8 @@
     <node id="node_adore">
       <job id="adore" />
       <sources>
-        <source scope="runtime" id="slave" title="TerraSAR-X slave product reference" abstract="Define the slave TerraSAR-X product reference to use with ADORE" refid="string:list">s3://terrasar-x/2014/02/TSX_20140201T164858.314_Etna_C221_O055_A_R_SM006_SSC.tar.gz</source>
+        <!--<source scope="runtime" id="slave" title="TerraSAR-X slave product reference" abstract="Define the slave TerraSAR-X product reference to use with ADORE" refid="string:list">s3://terrasar-x/2014/02/TSX_20140201T164858.314_Etna_C221_O055_A_R_SM006_SSC.tar.gz</source>-->
+        <source scope="runtime" id="slave" title="TerraSAR-X slave product reference" abstract="Define the slave TerraSAR-X product reference to use with ADORE" refid="string:list">http://eo-virtual-archive4.esa.int/search/ASA_IMS_1P/ASA_IMS_1PNPDE20090412_092427_000000162078_00079_37207_1530.N1/rdf</source>
       </sources>
       <parameters/>
     </node>
