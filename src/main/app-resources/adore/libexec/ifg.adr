@@ -40,7 +40,7 @@ settings apply -q -r raster_format=png
 [ ${m_in_method} == ASAR ] && {
   mkdir ./aux
   tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ODR.tgz -C ./aux
-  settings apply -r m_orbdir=./aux
+  settings apply -r m_orbdir=./aux/ODR
 }
 
 # save the settings

@@ -1,5 +1,5 @@
 #!/bin/bash
- 
+set -x 
 # source the ciop functions (e.g. ciop-log)
 source ${ciop_job_include}
 
@@ -13,16 +13,16 @@ ERR_PUBLISH_RES=50
 ERR_PUBLISH_PNG=60
 
 # add a trap to exit gracefully
-function cleanExit ()
-{
+cleanExit () { 
+
   local retval=$?
   local msg=""
 	
   case "$retval" in
-		$SUCCESS) msg="Processing successfully concluded";;
+    $SUCCESS) msg="Processing successfully concluded";;
 		$ERR_MASTER) msg="Failed to retrieve the master product";;
-     $ERR_SLAVE) msg="Failed to retrieve the slave product";;
-$ERR_EXTRACT) msg="Failed to retrieve the extract the vol and lea";;
+    $ERR_SLAVE) msg="Failed to retrieve the slave product";;
+    $ERR_EXTRACT) msg="Failed to retrieve the extract the vol and lea";;
 		$ERR_ADORE) msg="Failed during ADORE execution";;
 		$ERR_PUBLISH_RES) msg="Failed results publish";;
 		$ERR_PUBLISH_PNG) msg="Failed results publish quicklooks";;
@@ -35,60 +35,81 @@ $ERR_EXTRACT) msg="Failed to retrieve the extract the vol and lea";;
 }
 trap cleanExit EXIT
 
-# shorter temp path 
-TMPDIR="/tmp/`uuidgen`"
+set_env() {
+  export SAR_HELPERS_HOME=/opt/sar-helpers/lib/
+  . ${SAR_HELPERS_HOME}/sar-helpers.sh
+  
+  export ADORESCR=/opt/adore/scr
+  export PATH=/usr/local/bin:/opt/adore/scr:${PATH}
 
-# creates the adore directory structure
-ciop-log "INFO" "creating the directory structure"
-mkdir -p $TMPDIR
-mkdir -p $TMPDIR/process
-cd $TMPDIR/process
+  # shorter temp path 
+  export TMPDIR=/tmp/$( uuidgen )
+  mkdir -p ${TMPDIR}/process
+  
 
-settings="`ciop-getparam settings`"
-ciop-log "INFO" "Additional settings for adore: $settings"
+  return $?
+}
 
-echo "$settings" | tr "," "\n" | sed 's/^/settings apply -r -q /' > $TMPDIR/process/settings.app
+set_app_pars() {
+  settings="$( ciop-getparam settings )"
+  [ ! -z "${settings}" ] && echo "${settings}" | tr "," "\n" | sed 's/^/settings apply -r -q /' > ${TMPDIR}/process/settings.app
+}
 
+get_data() {
+  local ref=$1
+  local target=$2
+  local local_file
+  local res
+  local_file="`echo ${ref} | ciop-copy -U -O ${target} -`"
+  res=$?
 
-master_ref="`ciop-getparam master`"
-slave_ref="`cat`"
+  [ $res -ne 0 ] && return $res
+  echo ${local_file}
+}
 
-ciop-log "INFO" "Retrieving master"
-master="`echo $master_ref | ciop-copy -U -O $TMPDIR -`"
-[ $? -ne 0 ] && exit $ERR_MASTER
+main() {
+  # creates the adore directory structure
+  ciop-log "INFO" "creating the directory structure"
+  set_env
 
-ciop-log "INFO" "Retrieving slave"
-slave="`echo $slave_ref | ciop-copy -U -O $TMPDIR -`"
-[ $? -ne 0 ] && exit $ERR_SLAVE
+  ciop-log "INFO" "Additional settings for adore"
+  set_app_pars
 
-ciop-log "INFO" "Create environment for Adore" 
-export SAR_HELPERS_HOME=/opt/sar-helpers/lib/
-. ${SAR_HELPERS_HOME}/sar-helpers.sh
+  master_ref="$( ciop-getparam master )"
+  slave_ref="$( cat )"
 
-create_env_adore ${master} ${slave} $TMPDIR/process
-[ $? -ne 0 ] && exit $ERR_EXTRACT
+  ciop-log "INFO" "Retrieving master"  
+  master=$( get_data ${master_ref} ${TMPDIR} )
+  [ $? -ne 0 ] && return ${ERR_MASTER}
 
-mission=$( get_mission $master | tr "A-Z" "a-z" )
+  ciop-log "INFO" "Retrieving slave"
+  slave=$( get_data ${slave_ref} ${TMPDIR} )
+  [ $? -ne 0 ] && return ${ERR_SLAVE}
 
-ciop-log "INFO" "Launching adore for TSX"
-cd $TMPDIR/process
-export ADORESCR=/opt/adore/scr
-export PATH=/usr/local/bin:/opt/adore/scr:$PATH
-adore "p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps"
+  ciop-log "INFO" "Create environment for Adore"
+  create_env_adore ${master} ${slave} ${TMPDIR}/process
+  [ $? -ne 0 ] && return ${ERR_EXTRACT}
 
-[ $? -ne 0 ] && exit $ERR_ADORE
+  mission=$( get_mission $master | tr "A-Z" "a-z" )  
 
-ciop-publish -m $TMPDIR/process/*.int
-res=$?
-[ $res -ne 0 ] && exit $ERR_PUBLISH_RES
+  ciop-log "INFO" "Launching adore for ${mission}"
+  cd $TMPDIR/process
+  adore "p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps"  
+  [ $? -ne 0 ] && return ${ERR_ADORE}
 
-ciop-publish -m $TMPDIR/process/adoretsx.list
+  ciop-publish -m ${TMPDIR}/process/*.int
+  [ $? -ne 0 ] && return ${ERR_PUBLISH_RES}
 
-# publish the quicklooks
-ciop-publish -m $TMPDIR/process/*.png
-res=$?
-[ $res -ne 0 ] && exit $ERR_PUBLISH_PNG
+  ciop-publish -m ${TMPDIR}/process/adore.list
 
-ciop-publish -m $TMPDIR/*.log
+  ciop-publish -m ${TMPDIR}/process/*.png
+  [ $? -ne 0 ] && return ${ERR_PUBLISH_PNG}
+  
+  ciop-publish -m ${TMPDIR}/*.log
+}
+
+cat | main
+
+[ $? -ne 0 ] && exit 55
  
 ciop-log "INFO" "Done"
