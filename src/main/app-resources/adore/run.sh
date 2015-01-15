@@ -96,7 +96,7 @@ main() {
 
   ciop-log "INFO" "Launching adore for ${mission}"
   cd $TMPDIR/process
-  adore "p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps"
+  adore "p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps ${mission}"
   [ $? -ne 0 ] && return ${ERR_ADORE}
 
   ciop-publish -m ${TMPDIR}/process/*.int
@@ -107,7 +107,7 @@ main() {
   ciop-publish -m ${TMPDIR}/process/*.png
   [ $? -ne 0 ] && return ${ERR_PUBLISH_PNG}
   
-  ciop-publish -m ${TMPDIR}/*.log
+  ciop-publish -m ${TMPDIR}/process/*.log
 }
 
 cat | main

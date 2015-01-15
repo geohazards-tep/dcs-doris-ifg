@@ -19,6 +19,7 @@ function assert() {
 }
 
 steps=${1}
+mission=${2}
 
 [ -f "./settings.app" ] && {
 
@@ -36,12 +37,28 @@ steps=${1}
 
 settings apply -q -r raster_format=png
 
-# ASAR needs orbit files
-[ ${m_in_method} == ASAR ] && {
-  mkdir ./aux
-  tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ODR.tgz -C ./aux
-  settings apply -r m_orbdir=./aux/ODR
-}
+
+# manage orbit files
+case ${mission} in
+  ASAR)
+    mkdir ./aux
+    tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ASAR_ODR.tgz -C ./aux
+    settings apply -q -r m_orbdir=./aux/ODR
+    settings apply -q -r s_orbdir=./aux/ODR
+    ;;
+  ERS1)
+    mkdir ./aux
+    tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ERS1_ODR.tgz -C ./aux
+    settings apply -q -r m_orbdir=./aux/ODR
+    settings apply -q -r s_orbdir=./aux/ODR
+    ;;    
+  ERS2)
+    mkdir ./aux
+    tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ERS2_ODR.tgz -C ./aux
+    settings apply -q -r m_orbdir=./aux/ODR
+    settings apply -q -r s_orbdir=./aux/ODR
+    ;;
+esac
 
 # save the settings
 settings save adore.set
