@@ -40,19 +40,19 @@ settings apply -q -r raster_format=png
 
 # manage orbit files
 case ${mission} in
-  ASAR)
+  asar)
     mkdir ./aux
     tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ASAR_ODR.tgz -C ./aux
     settings apply -q -r m_orbdir=./aux/ODR
     settings apply -q -r s_orbdir=./aux/ODR
     ;;
-  ERS1)
+  ers1)
     mkdir ./aux
     tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ERS1_ODR.tgz -C ./aux
     settings apply -q -r m_orbdir=./aux/ODR
     settings apply -q -r s_orbdir=./aux/ODR
     ;;    
-  ERS2)
+  ers2)
     mkdir ./aux
     tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ERS2_ODR.tgz -C ./aux
     settings apply -q -r m_orbdir=./aux/ODR
