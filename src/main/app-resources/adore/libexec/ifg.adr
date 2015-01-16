@@ -5,7 +5,7 @@ function now() {
 
 function shout() {
   [ -n "$3" ] && proc="$3" || proc="user process"
-  echo "`now` [${1}     ][$proc] ${2}" >&2  
+  echo "`now` [${1}   ][$proc] ${2}" >&2  
   [ "${USER}" == "mapred" ] && echo "reporter:status:$( now ) [${1}  ][${proc}] ${2}" >&2
 }
 
@@ -21,13 +21,6 @@ function assert() {
 steps=${1}
 mission=${2}
 
-[ -f "./settings.app" ] && {
-
-  shout "INFO" "Settings additional parameters"
-  . ./settings.app
-
-}
-
 [ -f "./settings.set" ] && {
 
   shout "INFO" "Settings environment parameters"
@@ -38,13 +31,15 @@ mission=${2}
 settings apply -q -r raster_format=png
 
 
-# manage orbit files
+# manage orbit files and extra settings for adore
 case ${mission} in
   asar)
     mkdir ./aux
     tar xfz ${_CIOP_APPLICATION_PATH}/adore/aux/ASAR_ODR.tgz -C ./aux
     settings apply -q -r m_orbdir=./aux/ODR
     settings apply -q -r s_orbdir=./aux/ODR
+    settings apply -q -r slc_az_res=4
+    settings apply -q -r slc_rg_res=20
     ;;
   ers1)
     mkdir ./aux
@@ -59,6 +54,17 @@ case ${mission} in
     settings apply -q -r s_orbdir=./aux/ODR
     ;;
 esac
+
+eval "export $( settings list | grep "^master=" )"
+eval "export $( settings list | grep "^slave=" )"
+
+# override with the app settings (application.xml)
+[ -f "./settings.app" ] && {
+
+  shout "INFO" "Settings additional parameters"
+  . ./settings.app
+
+}
 
 # save the settings
 settings save adore.set

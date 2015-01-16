@@ -23,7 +23,7 @@ coherence
 unwrap
 slant2h
 geocode
-raster p subtrrefdem $multilook_factor
+raster p subtrrefdem ${multilook_factor}
 raster p subtrrefpha $multilook_factor
 raster p interfero $multilook_factor
 raster p coherence $multilook_factor -cgray -b
@@ -35,7 +35,7 @@ raster m subtrrefdem $multilook_factor
 raster m subtrrefpha $multilook_factor
 raster m interfero $multilook_factor
 raster m coherence $multilook_factor -cgray -b
-saveas gdal p subtrrefdem -of GTiff master__srd.tiff
-saveas gdal p subtrrefpha -of GTiff master__srp.tiff
-saveas gdal p interfero -of GTiff master__cint.tiff
-saveas gdal p coherence -of GTiff master__coh.tiff
+saveas gdal p subtrrefdem -of GTiff ${master}_${slave}_srd.tiff
+saveas gdal p subtrrefpha -of GTiff ${master}_${slave}_srp.tiff
+saveas gdal p interfero -of GTiff ${master}_${slave}_cint.tiff
+saveas gdal p coherence -of GTiff ${master}_${slave}_coh.tiff

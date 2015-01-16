@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x 
+
 # source the ciop functions (e.g. ciop-log)
 source ${ciop_job_include}
 
@@ -10,7 +10,6 @@ ERR_SLAVE=20
 ERR_EXTRACT=30
 ERR_ADORE=40
 ERR_PUBLISH_RES=50
-ERR_PUBLISH_PNG=60
 
 # add a trap to exit gracefully
 cleanExit () { 
@@ -26,7 +25,6 @@ cleanExit () {
     ${ERR_EXTRACT}) msg="Failed to retrieve the extract the vol and lea";;
 		${ERR_ADORE}) msg="Failed during ADORE execution";;
 		${ERR_PUBLISH_RES}) msg="Failed results publish";;
-		${ERR_PUBLISH_PNG}) msg="Failed results publish quicklooks";;
 		*) msg="Unknown error";;
   esac
 
@@ -69,6 +67,19 @@ get_data() {
   echo ${local_file}
 }
 
+publish_result() {
+  local extension="$1"
+  local count
+
+  count=$( ls -1 *.${extension} 2>/dev/null | wc -l )
+  
+  [ ${count} -ne 0 ] && { 
+    ciop-publish -m ${TMPDIR}/process/*.${extension}
+    [ $? -ne 0 ] && return ${ERR_PUBLISH_RES}
+  }
+  return 0
+}
+
 main() {
   # creates the adore directory structure
   ciop-log "INFO" "creating the directory structure"
@@ -99,15 +110,17 @@ main() {
   adore "p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps ${mission}"
   [ $? -ne 0 ] && return ${ERR_ADORE}
 
-  ciop-publish -m ${TMPDIR}/process/*.int
-  [ $? -ne 0 ] && return ${ERR_PUBLISH_RES}
-
-  ciop-publish -m ${TMPDIR}/process/adore.list
-
-  ciop-publish -m ${TMPDIR}/process/*.png
-  [ $? -ne 0 ] && return ${ERR_PUBLISH_PNG}
+  publish_result int || return $?
+ 
+  publish_result png || return $?
   
-  ciop-publish -m ${TMPDIR}/process/*.log
+  publish_result tiff || return $?
+
+  publish_result log || return $?
+
+  # publish the settings 
+  ciop-publish -m ${TMPDIR}/process/adore.list
+ 
 }
 
 cat | main
