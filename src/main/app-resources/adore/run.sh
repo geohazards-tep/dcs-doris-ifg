@@ -60,7 +60,7 @@ get_data() {
   local target=$2
   local local_file
   local res
-  local_file="`echo ${ref} | ciop-copy -U -O ${target} -`"
+  local_file="`echo ${ref} | ciop-copy -f -U -O ${target} -`"
   res=$?
 
   [ $res -ne 0 ] && return $res
