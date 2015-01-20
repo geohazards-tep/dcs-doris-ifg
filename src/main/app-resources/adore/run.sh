@@ -8,8 +8,11 @@ SUCCESS=0
 ERR_MASTER=10
 ERR_SLAVE=20
 ERR_EXTRACT=30
+ERR_MISSION=31
+ERR_TRACK=32
 ERR_ADORE=40
 ERR_PUBLISH_RES=50
+ERR_UNKNOWN=55
 
 # add a trap to exit gracefully
 cleanExit () { 
@@ -23,9 +26,11 @@ cleanExit () {
 		${ERR_MASTER}) msg="Failed to retrieve the master product";;
     ${ERR_SLAVE}) msg="Failed to retrieve the slave product";;
     ${ERR_EXTRACT}) msg="Failed to retrieve the extract the vol and lea";;
+    ${ERR_MISSION}) msg="Master and slave have mismatching missions";;
+    ${ERR_TRACK}) msg="Master and slave have mismatching tracks";;
 		${ERR_ADORE}) msg="Failed during ADORE execution";;
 		${ERR_PUBLISH_RES}) msg="Failed results publish";;
-		*) msg="Unknown error";;
+		*|${ERR_UNKNOWN}) msg="Unknown error";;
   esac
 
   [ "${retval}" != "0" ] && ciop-log "ERROR" \
@@ -81,6 +86,7 @@ publish_result() {
 }
 
 main() {
+  local res
   # creates the adore directory structure
   ciop-log "INFO" "creating the directory structure"
   set_env
@@ -101,7 +107,14 @@ main() {
 
   ciop-log "INFO" "Create environment for Adore"
   create_env_adore ${master} ${slave} ${TMPDIR}/process
-  [ $? -ne 0 ] && return ${ERR_EXTRACT}
+  res=$?
+  case $res in
+    0) ciop-log "INFO" "Successfully created environment for Adore";;
+    1) return ${ERR_MISSION};; 
+    2) return ${ERR_TRACK};;
+    3) return ${ERR_ADORE_ENV};;  
+    *) return ${ERR_UNKNOWN};;
+  esac
 
   mission=$( get_mission $master | tr "A-Z" "a-z" )  
 
@@ -124,7 +137,7 @@ main() {
 }
 
 cat | main
-
-[ $? -ne 0 ] && exit 55
+res=$?
+[ $res -ne 0 ] && exit $res
  
 ciop-log "INFO" "Done"
