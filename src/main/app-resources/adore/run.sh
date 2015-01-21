@@ -49,7 +49,7 @@ set_env() {
 
   # shorter temp path 
   export TMPDIR=/tmp/$( uuidgen )
-  mkdir -p ${TMPDIR}/process
+  mkdir -p ${TMPDIR}
   return $?
 }
 
@@ -57,7 +57,7 @@ set_app_pars() {
   settings="$( ciop-getparam settings )"
   [ ! -z "${settings}" ] && echo "${settings}" \
     | tr "," "\n" \
-    | sed 's/^/settings apply -r -q /' > ${TMPDIR}/process/settings.app
+    | sed 's/^/settings apply -r -q /' > ${TMPDIR}/settings.app
 }
 
 get_data() {
@@ -79,7 +79,7 @@ publish_result() {
   count=$( ls -1 *.${extension} 2>/dev/null | wc -l )
   
   [ ${count} -ne 0 ] && { 
-    ciop-publish -m ${TMPDIR}/process/*.${extension}
+    ciop-publish -m ${TMPDIR}/*.${extension}
     [ $? -ne 0 ] && return ${ERR_PUBLISH_RES}
   }
   return 0
@@ -95,7 +95,7 @@ main() {
   set_app_pars
 
   master_ref="$( ciop-getparam master )"
-  slave_ref="$( cat )"
+  slave_ref="$1"
 
   ciop-log "INFO" "Retrieving master"  
   master=$( get_data ${master_ref} ${TMPDIR} )
@@ -106,8 +106,9 @@ main() {
   [ $? -ne 0 ] && return ${ERR_SLAVE}
 
   ciop-log "INFO" "Create environment for Adore"
-  create_env_adore ${master} ${slave} ${TMPDIR}/process
+  TMPDIR=$( create_env_adore ${master} ${slave} ${TMPDIR} )
   res=$?
+
   case $res in
     0) ciop-log "INFO" "Successfully created environment for Adore";;
     1) return ${ERR_MISSION};; 
@@ -119,7 +120,7 @@ main() {
   mission=$( get_mission $master | tr "A-Z" "a-z" )  
 
   ciop-log "INFO" "Launching adore for ${mission}"
-  cd $TMPDIR/process
+  cd $TMPDIR
   adore "p ${_CIOP_APPLICATION_PATH}/adore/libexec/ifg.adr ${_CIOP_APPLICATION_PATH}/adore/etc/${mission}.steps ${mission}"
   [ $? -ne 0 ] && return ${ERR_ADORE}
 
@@ -132,12 +133,14 @@ main() {
   publish_result log || return $?
 
   # publish the settings 
-  ciop-publish -m ${TMPDIR}/process/adore.list
+  ciop-publish -m ${TMPDIR}/adore.list
  
 }
 
-cat | main
-res=$?
-[ $res -ne 0 ] && exit $res
- 
+cat | while read myslave; do
+  main $myslave
+  res=$?
+  [ $res -ne 0 ] && exit $res
+done
+
 ciop-log "INFO" "Done"
