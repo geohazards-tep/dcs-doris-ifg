@@ -75,7 +75,7 @@ export multilook_factor="`cat adore.list | grep int_multilook | sed 's/int_multi
 cat ${steps} | while read step
 do
   shout "INFO" "processing $step"
-  [ ${step:0:1} != "#" ] && eval "$step" &> ${step//[^a-zA-Z_0-9]/_}.log
+  [ ${step:0:1} != "#" ] && eval "$step" &> ${master}_${slave}_${step//[^a-zA-Z_0-9]/_}.log
   assert $? "${step}"
   res=$? 
   [ "${res}" != "0" ] && return ${res}
