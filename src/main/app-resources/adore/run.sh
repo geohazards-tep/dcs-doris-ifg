@@ -80,7 +80,7 @@ publish_result() {
   
   [ ${count} -ne 0 ] && { 
     cd ..
-    ciop-publish -m $( echo ${TMPDIR} | sed 's#.*\(/.*\)#\1#g' )/*.${extension}
+    ciop-publish -m $( echo ${TMPDIR} | sed 's#.*/\(.*\)#\1#g' )/*.${extension}
     [ $? -ne 0 ] && return ${ERR_PUBLISH_RES}
   }
   return 0
