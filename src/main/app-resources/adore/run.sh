@@ -57,7 +57,7 @@ set_app_pars() {
   settings="$( ciop-getparam settings )"
   [ ! -z "${settings}" ] && echo "${settings}" \
     | tr "," "\n" \
-    | sed 's/^/settings apply -r -q /' > ${TMPDIR}/settings.app
+    | sed 's/^/settings apply -r -q /' > ${TMPDIR}/user.set
 }
 
 get_data() {
@@ -65,7 +65,7 @@ get_data() {
   local target=$2
   local local_file
   local res
-  local_file="`echo ${ref} | ciop-copy -f -U -O ${target} -`"
+  local_file="$( echo ${ref} | ciop-copy -f -U -O ${target} - 2> /dev/null )"
   res=$?
 
   [ $res -ne 0 ] && return $res
@@ -79,7 +79,8 @@ publish_result() {
   count=$( ls -1 *.${extension} 2>/dev/null | wc -l )
   
   [ ${count} -ne 0 ] && { 
-    ciop-publish -m ${TMPDIR}/*.${extension}
+    cd ..
+    ciop-publish -m $( echo ${TMPDIR} | sed 's#.*\(/.*\)#\1#g' )/*.${extension}
     [ $? -ne 0 ] && return ${ERR_PUBLISH_RES}
   }
   return 0
@@ -91,9 +92,6 @@ main() {
   ciop-log "INFO" "creating the directory structure"
   set_env
 
-  ciop-log "INFO" "Additional settings for adore"
-  set_app_pars
-
   master_ref="$( ciop-getparam master )"
   slave_ref="$1"
 
@@ -104,6 +102,8 @@ main() {
   ciop-log "INFO" "Retrieving slave"
   slave=$( get_data ${slave_ref} ${TMPDIR} )
   [ $? -ne 0 ] && return ${ERR_SLAVE}
+
+  mission=$( get_mission $master | tr "A-Z" "a-z" )
 
   ciop-log "INFO" "Create environment for Adore"
   TMPDIR=$( create_env_adore ${master} ${slave} ${TMPDIR} )
@@ -117,7 +117,8 @@ main() {
     *) return ${ERR_UNKNOWN};;
   esac
 
-  mission=$( get_mission $master | tr "A-Z" "a-z" )  
+  ciop-log "INFO" "Additional settings for adore"
+  set_app_pars
 
   ciop-log "INFO" "Launching adore for ${mission}"
   cd $TMPDIR
@@ -133,7 +134,7 @@ main() {
   publish_result log || return $?
 
   # publish the settings 
-  ciop-publish -m ${TMPDIR}/adore.list
+  ciop-publish -m ${TMPDIR}/*adore.pars
  
 }
 

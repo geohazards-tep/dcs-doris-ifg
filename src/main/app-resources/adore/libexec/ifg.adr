@@ -59,17 +59,17 @@ eval "export $( settings list | grep "^master=" )"
 eval "export $( settings list | grep "^slave=" )"
 
 # override with the app settings (application.xml)
-[ -f "./settings.app" ] && {
+[ -f "./user.set" ] && {
 
   shout "INFO" "Settings additional parameters"
-  . ./settings.app
+  . ./user.set
 
 }
 
 # save the settings
 settings save adore.set
-settings list > adore.list
-export multilook_factor="`cat adore.list | grep int_multilook | sed 's/int_multilook="//' | sed 's/"//' | tr " " "/" | sed 's/^/ -M/'`"
+settings list > ${master}_${slave}_adore.pars
+export multilook_factor="`cat ${master}_${slave}_adore.pars | grep int_multilook | sed 's/int_multilook="//' | sed 's/"//' | tr " " "/" | sed 's/^/ -M/'`"
 
 
 cat ${steps} | while read step
