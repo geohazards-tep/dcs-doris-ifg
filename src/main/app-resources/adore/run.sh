@@ -77,12 +77,13 @@ publish_result() {
   local count
 
   count=$( ls -1 *.${extension} 2>/dev/null | wc -l )
-  
+
   [ ${count} -ne 0 ] && { 
-    cd ..
-    ciop-publish -m $( echo ${TMPDIR} | sed 's#.*/\(.*\)#\1#g' )/*.${extension}
+    cd $TMPDIR/..
+    ciop-publish -b $TMPDIR/.. -m $( echo ${TMPDIR} | sed 's#.*/\(.*\)#\1#g' )/*.${extension}
     [ $? -ne 0 ] && return ${ERR_PUBLISH_RES}
   }
+  cd $TMPDIR
   return 0
 }
 
