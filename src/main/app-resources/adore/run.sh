@@ -13,6 +13,7 @@ ERR_TRACK=32
 ERR_ADORE=40
 ERR_PUBLISH_RES=50
 ERR_UNKNOWN=55
+ERR_WRONG_POINT=69
 
 # add a trap to exit gracefully
 cleanExit () { 
@@ -23,14 +24,14 @@ cleanExit () {
 	
   case "${retval}" in
     ${SUCCESS}) msg="Processing successfully concluded";;
-		${ERR_MASTER}) msg="Failed to retrieve the master product";;
+    ${ERR_MASTER}) msg="Failed to retrieve the master product";;
     ${ERR_SLAVE}) msg="Failed to retrieve the slave product";;
     ${ERR_EXTRACT}) msg="Failed to retrieve the extract the vol and lea";;
     ${ERR_MISSION}) msg="Master and slave have mismatching missions";;
     ${ERR_TRACK}) msg="Master and slave have mismatching tracks";;
-		${ERR_ADORE}) msg="Failed during ADORE execution";;
-		${ERR_PUBLISH_RES}) msg="Failed results publish";;
-		*|${ERR_UNKNOWN}) msg="Unknown error";;
+    ${ERR_ADORE}) msg="Failed during ADORE execution";;
+    ${ERR_PUBLISH_RES}) msg="Failed results publish";;
+    *|${ERR_UNKNOWN}) msg="Unknown error";;
   esac
 
   [ "${retval}" != "0" ] && ciop-log "ERROR" \
@@ -54,10 +55,52 @@ set_env() {
 }
 
 set_app_pars() {
+  #set default values
+  rs_dbow_geo="0 0 0 0"
+  m_dbow_geo="0 0 0 0"
+  s_dbow_geo="0 0 0 0"
+  
+  point="$( ciop-getparam poi )" 
+  extent="$( ciop-getparam extent )"
   settings="$( ciop-getparam settings )"
-  [ ! -z "${settings}" ] && echo "${settings}" \
-    | tr "," "\n" \
-    | sed 's/^/settings apply -r -q /' > ${TMPDIR}/user.set
+
+  ciop-log "DEBUG" "checking user provided settings"
+ 
+  [ -n "${settings}" ] && {
+    ciop-log "DEBUG" "got settings"
+    [ -z "$( echo "${settings}" | tr ',' '\n' | grep "_dbow_geo" )"  ] && {
+      #checking point and extent were provided
+      ciop-log "DEBUG" "got no dbow"
+      [ -n "${point}" ] && [ -n "${extent}"  ] && {
+        ciop-log "DEBUG" "point and extent provided [${point} ${extent}]"
+
+        IFS=' ' read -r lon lat <<< $( echo "${point}" | sed "s#POINT(##" | sed "s/)//" )
+        IFS=',' read -r x_extent y_extent <<< "${extent}"
+
+        #checking lon lat consistency
+        [ $( echo "${lon}>=-180" | bc -l ) -eq 1 ] && [ $( echo "${lon}<=180" | bc -l ) -eq 1 ] || return ${ERR_WRONG_POINT}
+        [ $( echo "${lat}>=-90" | bc -l ) -eq 1 ] && [ $( echo "${lat}<=90" | bc -l ) -eq 1 ] || return ${ERR_WRONG_POINT}     
+
+        mx_extent=$( printf %.$2f $( echo "scale=0; ${x_extent} * 1.1" | bc ))
+        my_extent=$( printf %.$2f $( echo "scale=0; ${y_extent} * 1.1" | bc ))
+
+        sx_extent=$( printf %.$2f $( echo "scale=0; ${x_extent} * 1.2" | bc ))
+        sy_extent=$( printf %.$2f $( echo "scale=0; ${y_extent} * 1.2" | bc ))
+
+        rs_dbow_geo="${lat} ${lon} ${x_extent} ${y_extent}"
+        m_dbow_geo="${lat} ${lon} ${mx_extent} ${my_extent}"
+        s_dbow_geo="${lat} ${lon} ${sx_extent} ${sy_extent}"
+
+        ext_settings="rs_dbow_geo=\"${rs_dbow_geo}\",m_dbow_geo=\"${m_dbow_geo}\",s_dbow_geo=\"${s_dbow_geo}\","
+      }
+    }
+
+    echo "${ext_settings}${settings}" \
+      | tr "," "\n" \
+      | sed 's/^/settings apply -r -q /' > ${TMPDIR}/user.set
+  }
+    
+
 }
 
 get_data() {

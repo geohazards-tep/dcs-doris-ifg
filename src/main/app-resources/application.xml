@@ -24,7 +24,9 @@
         <parameter id="master" title="master product reference" abstract="Define the master product reference to use with ADORE" scope="runtime">/tmp/doris/ASA_IMS_1PNPDE20090412_092427_000000162078_00079_37207_1530.N1</parameter>
         -->
         <!-- end of Envisat ASAR L'Aquila -->
-        <parameter id="settings" title="Settings for ADORE Doris separated by comma" abstract="Settings for ADORE Doris separated by comma" scope="runtime">m_dbow_geo="42.35 13.4 2000 2000",s_dbow_geo="42.35 13.4 2200 2200",rs_dbow_geo="42.35 13.4 1800 1800",cc_winsize="128 128",fc_acc="8 8",int_multilook="4 4",coh_multilook="4 4",dumpbaseline="15 10"</parameter>
+        <parameter id="poi" title="Point of interest" abstract="Point of interest WKT, e.g. POINT(longitude latitude)" scope="runtime">POINT(13.4 42.35)</parameter>
+        <parameter id="extent" title="Extent" abstract="extent" scope="runtime">2000,2000</parameter>
+        <parameter id="settings" title="Settings for ADORE Doris separated by comma" abstract="Settings for ADORE Doris separated by comma" scope="runtime">cc_winsize="128 128",fc_acc="8 8",int_multilook="4 4",coh_multilook="4 4",dumpbaseline="15 10"</parameter>
         <parameter id="master" title="master product reference" abstract="Define the master product reference to use with ADORE" scope="runtime">/tmp/doris/ASA_IMS_1PNDPA20090311_204746_000000162077_00129_36756_3125.N1</parameter>
       </defaultParameters>
       <defaultJobconf>
