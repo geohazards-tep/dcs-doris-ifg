@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # source the ciop functions (e.g. ciop-log)
 source ${ciop_job_include}
 
@@ -13,7 +12,9 @@ ERR_TRACK=32
 ERR_ADORE=40
 ERR_PUBLISH_RES=50
 ERR_UNKNOWN=55
-ERR_WRONG_POINT=69
+ERR_WRONG_POINT=60
+ERR_MISSION_MASTER=35
+ERR_GETDATA=15
 
 # add a trap to exit gracefully
 cleanExit () { 
@@ -28,6 +29,7 @@ cleanExit () {
     ${ERR_SLAVE}) msg="Failed to retrieve the slave product";;
     ${ERR_EXTRACT}) msg="Failed to retrieve the extract the vol and lea";;
     ${ERR_MISSION}) msg="Master and slave have mismatching missions";;
+    ${ERR_MISSION_MASTER}) msg="Failed to retrieve mission from master";;
     ${ERR_TRACK}) msg="Master and slave have mismatching tracks";;
     ${ERR_ADORE}) msg="Failed during ADORE execution";;
     ${ERR_PUBLISH_RES}) msg="Failed results publish";;
@@ -107,11 +109,17 @@ get_data() {
   local ref=$1
   local target=$2
   local local_file
+  local enclosure
   local res
-  local_file="$( echo ${ref} | ciop-copy -f -U -O ${target} - 2> /dev/null )"
+
+  enclosure="$( opensearch-client  "${ref}" enclosure )"
+  # opensearh client doesn't deal with local paths
+  [ $? -eq 0 ] && [ -z "${enclosure}" ] && return ${ERR_GETDATA}
+  [ $? -ne 0 ] && enclosure=${ref}
+  local_file="$( echo ${enclosure} | ciop-copy -f -U -O ${target} - 2> /dev/null )"
   res=$?
 
-  [ $res -ne 0 ] && return $res
+  [ ${res} -ne 0 ] && return ${res}
   echo ${local_file}
 }
 
@@ -148,6 +156,7 @@ main() {
   [ $? -ne 0 ] && return ${ERR_SLAVE}
 
   mission=$( get_mission $master | tr "A-Z" "a-z" )
+  [ $? -ne 0 ] && return ${ERR_MISSION_MASTER}
 
   ciop-log "INFO" "Create environment for Adore"
   TMPDIR=$( create_env_adore ${master} ${slave} ${TMPDIR} )
@@ -177,15 +186,14 @@ main() {
 
   publish_result log || return $?
 
-  # publish the settings 
-  ciop-publish -m ${TMPDIR}/*adore.pars
+  publish_result pars || return $?  
  
 }
 
-cat | while read myslave; do
-  main $myslave
+while read slave; do
+  main "${slave}"
   res=$?
-  [ $res -ne 0 ] && exit $res
+  [ ${res} -ne 0 ] && exit ${res}
 done
 
-ciop-log "INFO" "Done"
+exit 0
