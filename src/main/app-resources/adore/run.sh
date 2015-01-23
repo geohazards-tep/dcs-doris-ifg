@@ -38,7 +38,7 @@ cleanExit () {
 
   [ "${retval}" != "0" ] && ciop-log "ERROR" \
     "Error ${retval} - ${msg}, processing aborted" || ciop-log "INFO" "${msg}"
-#  rm -rf $TMPDIR	
+  rm -rf $TMPDIR	
   exit ${retval}
 }
 trap cleanExit EXIT
