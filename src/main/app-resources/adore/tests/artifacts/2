@@ -1,0 +1,4 @@
+settings apply -r -q rs_dbow_geo="0.0 0.0 2000 2000"
+settings apply -r -q m_dbow_geo="0.0 0.0 2200 2200"
+settings apply -r -q s_dbow_geo="0.0 0.0 2400 2400"
+settings apply -r -q cc_winsize="128 128"

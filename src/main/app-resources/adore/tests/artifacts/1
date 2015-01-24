@@ -1,0 +1,3 @@
+settings apply -r -q cc_winsize="128 128"
+settings apply -r -q m_dbow_geo="37.755 14.995 12200 12200"
+settings apply -r -q rs_dbow_geo="37.755 14.995 12000 12000"

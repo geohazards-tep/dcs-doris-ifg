@@ -1,0 +1,11 @@
+#!/bin/bash
+ 
+param=$1
+
+#. $(dirname $0)/../runtime/values
+
+case $param in
+  poi) echo "$POI";;
+  extent) echo "$EXTENT";;
+  settings) echo "$SETTINGS";;
+esac
