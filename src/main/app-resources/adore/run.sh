@@ -231,3 +231,4 @@ while read slave; do
   [ ${res} -ne 0 ] && exit ${res}
 done
 
+[ "$mode" != "test" ] && exit 0
