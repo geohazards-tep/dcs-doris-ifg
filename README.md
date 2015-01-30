@@ -37,6 +37,7 @@ Downgrade *geos* and install python-lxml:
 sudo yum -y downgrade geos-3.3.2
 sudo yum -y install python-lxml
 sudo yum -y install snaphu
+sudo yum -y install sar-helpers
 ```
 
 ##### Using the releases
