@@ -122,7 +122,7 @@
 						<require>snaphu</require>
 						<require>python-lxml</require>
 					</requires>
-					<needarch>true</needarch>
+					<!-- <needarch>true</needarch> -->
 				</configuration>
 			</plugin>
 
