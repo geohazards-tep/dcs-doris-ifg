@@ -1,0 +1,1 @@
+settings apply -r -q cc_winsize="64 64"
