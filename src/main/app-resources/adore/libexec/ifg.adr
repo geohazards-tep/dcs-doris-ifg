@@ -61,7 +61,7 @@ eval "export $( settings list | grep "^slave=" )"
 # override with the app settings (application.xml)
 [ -f "./user.set" ] && {
 
-  shout "INFO" "Settings additional parameters"
+  shout "INFO" "Setting additional parameters"
   . ./user.set
 
 }
