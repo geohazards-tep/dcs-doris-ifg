@@ -18,7 +18,6 @@ This field guide has a single objective: implement a Web Processing Service to g
    
     What you will learn <learn>
     Addressing a scientific and processing goal <goal>
-    Rationales for the processing chain <rational>
     Data preparation <data>
     Workflow design <workflow>
     Processing nodes design <nodes>

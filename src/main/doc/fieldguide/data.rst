@@ -1,86 +1,99 @@
 Data preparation
 ================
 
-The data preparation step foresees:
+The data preparation step foresees to copy test data to the sandbox, and register it in the sandbox's local catalogue service. 
 
-* Copying the Landsat sample products to the Sandbox
-* The conversion of the multiple GeoTFF files that compose a Landsat product into a single ERDAS .img product
-* Copying the ERDAS .img products to the Laboratory S3 storage
-* Registering the ERDAS .img products in the Sandbox local catalogue
+The application uses Envisat ASAR Image Mode Single Look Complex (ASA_IMS_1P) data. ESA provides access to thousands of SAR products via the EO Virtual Archive 4 (also available in the Geohazards Exploitation Platform). 
 
-Copying Landsat sample products to the Sandbox
-**********************************************
+The following section shows how to copy the test data on the sandbox's local storage and register it on the sandbox's local catalogue. 
+The same techniques can be applied with the other OpenSearch catalogues.
+ 
+Copying test data on your Sandbox
+*********************************
 
-Log on the Sandbox shell and run:
+The sandbox includes a catalogue service exposing the OpenSearch interface. 
+A Web Client is available at http://localhost/catalogue/sandbox for interactive search and retrieve tasks.
+At initialisation, the sandbox contains no data, so clicking on the Search button will not return any results.
+
+You will use the ciop-catcp [#f1]_ utility to copy both the data and metadata from a source catalogue. The source catalogue that we consider here is Terradue's Cloud Platform catalogue, containing a subset of the Envisat MERIS mission. 
+The ciop-catcp utility takes an OpenSearch URL and a few options to optionally copy the data and register the metadata.  
+
+The ciop-catcp utility relies on ciop-copy, a utility to stage-in data to the sandbox from a myriad of data repositories.
+
+The EO Virtual Archive 4 uses ESA's EO Single Sign-On (EO-SSO) to control the authentication of data requests. In order to use ciop-copy and thus ciop-catcp, you have to initialize the credentials on your sandbox home folder.
+  
+On the sandbox' shell, run the command below making sure to replace the place holders with your EO-SSO credentials:
 
 .. code-block:: console
 
-  curl http://landsat.usgs.gov/documents/L5_30m19910616.tgz | tar xvfz -
-  curl http://landsat.usgs.gov/documents/L5_30m19950627.tgz | tar xvfz -
-  curl http://landsat.usgs.gov/documents/L7_30m19990817.tgz | tar xvfz -
-  curl http://landsat.usgs.gov/documents/L7_30m20090422.tgz | tar xvfz -
+  echo "eo-sso-idp.eo.esa.int=<your EO-SSO username>:<your EO-SSO password>" > .ciop-copy_cred 
 
-This will download and extract the files from the compressed archives.
-
-Format conversion
-*****************
-
-Use GDAL to convert the several GeoTIFF files (one for each Landsat band) to ERDAS .img format by creating a GDAL Virtual Format [#f1]_
-
-On the Sandbox shell run the command:
+On the sandbox' shell, run the command:
 
 .. code-block:: console
 
-  gdalbuildvrt -separate myvrt L5043033_03319950627_B10.TIF \
-    L5043033_03319950627_B20.TIF \
-    L5043033_03319950627_B30.TIF \
-    L5043033_03319950627_B40.TIF \
-    L5043033_03319950627_B50.TIF \
-    L5043033_03319950627_B60.TIF \
-    L5043033_03319950627_B70.TIF 
+ ciop-catcp -m byval "http://catalogue.terradue.int/catalogue/search/MER_RR__1P/rdf?start=2012-04-05T10:00:00&stop=2012-04-08"
+
+This will take the Envisat MERIS Level 1 acquisitions available on Terradue's catalogue and copy them to the local sandbox filesystem and catalogue. The operation can take a few minutes. Then you will get a message about things being successfully registered in the local catalogue.
+
+
+To check the registered data and verify its accessibility, go back to the sandbox catalogue Web Client, and click the 'Search' button. The graphical interface will show the data now available locally to the sandbox.
+
+.. figure:: assets/lib_beam_catui.png
+  :width: 500px
+  :align: center
+  :alt: alternate text
+  :figclass: align-center
+
+  The Sandbox catalogue user interface showing the registered data
+
+Click on one product from the list on the left, and then on the Access tab below the map. 
+
+.. figure:: assets/lib_beam_catui_prd.png
+  :width: 500px
+  :align: center
+  :alt: alternate text
+  :figclass: align-center
+
+  The Sandbox catalogue user interface showing the selected product details
   
-and finally:
+Finally click on the related HTTP URL. The download of the selected MERIS Level 1 product starts.
+
+Copy the link to the selected MERIS file, go back to the sandbox shell and type
 
 .. code-block:: console
-  
-  gdal_translate -of HFA myvrt L5043033_03319950627.img
-  
-Repeat the two steps above with the other three Landsat products.
 
-Copying the ERDAS .img products to S3 storage
-*********************************************
+ cd 
+ ciop-copy -o ./ http://localhost/data/MER_RR__1PRLRA20120407_112751_000026243113_00253_52853_0364.N1
 
-On the Sandbox shell run the command:
+This will copy the locally registered MER_RR__1PRLRA20120407_112751_000026243113_00253_52853_0364.N1 product in the Sandbox' home folder.
+
+The ciop-copy [#f2]_ utility does more than simply copying HTTP URLs, it can also consume the catalogue entry RDF URL as input. 
+Go back to the catalogue Web Client, and click on the Metadata tab, and then on the RDF logo:
+
+.. figure:: assets/lib_beam_metadata_tab.png
+  :width: 350px
+  :align: center
+  :alt: alternate text
+  :figclass: align-center
+
+  The Sandbox catalogue interface tab for product metadata
+
+This will open the MERIS product catalogue entry in the RDF format. Copy that URL in order to use it as argument to ciop-copy:
 
 .. code-block:: console
 
-  s3cmd put *.img s3://<your_laboratory>-private/data/
-  
-List the uploaded files:
+ cd
+ ciop-copy -o ./ http://localhost/catalogue/sandbox/MER_RR__1P/MER_RR__1PRLRA20120407_112751_000026243113_00253_52853_0364.N1/rdf
+ 
+Once the download is completed, the MERIS product is available in your /home folder. The same strategy is adopted when copying a file from the storage in a run executable.
 
-.. code-block:: console
-
-  s3cmd ls s3://<your_laboratory>-private/data/
-  
-Registering the ERDAS .img products in the Sandbox local catalogue
-******************************************************************
-
-To register the Landsat products converted to ERDAS .img format, you need to create a dataset series which is a container for the datasets.
-
-Copy the contents of the file below into a file named *series.rdf* in your home.
-
-:download:`Landsat series <files/series.rdf>`
-
-For each Landsat product, generate a file containing the dataset metadata.
-
-.. todo:: FABIO!!
-
-Finally go to the Sandbox catalogue Web Interface at the address http://<sandbox IP>/catalogue/search and click search, you will see the Landsat products!
 
 .. admonition:: Congrats!
 
-  There is now Landsat 5&7 data available on the Laboratory S3 storage and registered on the Sandbox catalogue!
-  
+ There is now some test data on your Sandbox! 
+
 .. rubric:: Footnotes
 
-.. [#f1] `GDAL Virtual format <http://www.gdal.org/gdal_vrttut.html>`_
+.. [#f1] :doc:`ciop-catcp man page </reference/man/bash_commands_functions/catalogue/ciop-catcp>`
+.. [#f2] :doc:`ciop-copy man page </reference/man/bash_commands_functions/data/ciop-copy>`
