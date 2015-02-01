@@ -121,6 +121,7 @@
 						<require>adore-t2</require>
 						<require>snaphu</require>
 						<require>python-lxml</require>
+						<require>sar-helpers</require>
 					</requires>
 					<!-- <needarch>true</needarch> -->
 				</configuration>
