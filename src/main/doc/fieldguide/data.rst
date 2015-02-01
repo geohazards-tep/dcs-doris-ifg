@@ -32,10 +32,9 @@ On the sandbox' shell, run the command:
 
 .. code-block:: console
 
- ciop-catcp -m byval "http://catalogue.terradue.int/catalogue/search/MER_RR__1P/rdf?start=2012-04-05T10:00:00&stop=2012-04-08"
+ ciop-catcp -m byval "http://eo-virtual-archive4.esa.int/search/ASA_IMS_1P/rdf//?startIndex=0&q=ASA_IMS_1P&start=1992-01-01&stop=2015-02-01&bbox=12.3,41.5,15,43.2&track=%5B129,129%5D"
 
-This will take the Envisat MERIS Level 1 acquisitions available on Terradue's catalogue and copy them to the local sandbox filesystem and catalogue. The operation can take a few minutes. Then you will get a message about things being successfully registered in the local catalogue.
-
+This will take the Envisat ASAR Image Mode Single Look Complex (ASA_IMS_1P) acquisitions over the Italian city L'Aquila available on the EO Virtual Archive catalogue and copy them to the local sandbox filesystem and catalogue. The operation can take a few minutes. Then you will get a message about the dataset being successfully registered in the local catalogue.
 
 To check the registered data and verify its accessibility, go back to the sandbox catalogue Web Client, and click the 'Search' button. The graphical interface will show the data now available locally to the sandbox.
 
@@ -64,9 +63,9 @@ Copy the link to the selected MERIS file, go back to the sandbox shell and type
 .. code-block:: console
 
  cd 
- ciop-copy -o ./ http://localhost/data/MER_RR__1PRLRA20120407_112751_000026243113_00253_52853_0364.N1
+ ciop-copy -o ./ http://localhost/data/ASA_IMS_1PNDPA20080326_204749_000000162067_00129_31746_3124.N1
 
-This will copy the locally registered MER_RR__1PRLRA20120407_112751_000026243113_00253_52853_0364.N1 product in the Sandbox' home folder.
+This will copy the locally registered ASA_IMS_1PNDPA20080326_204749_000000162067_00129_31746_3124.N1 product in the Sandbox' home folder.
 
 The ciop-copy [#f2]_ utility does more than simply copying HTTP URLs, it can also consume the catalogue entry RDF URL as input. 
 Go back to the catalogue Web Client, and click on the Metadata tab, and then on the RDF logo:
@@ -79,12 +78,12 @@ Go back to the catalogue Web Client, and click on the Metadata tab, and then on 
 
   The Sandbox catalogue interface tab for product metadata
 
-This will open the MERIS product catalogue entry in the RDF format. Copy that URL in order to use it as argument to ciop-copy:
+This will open the ASAR product catalogue entry in the RDF format. Copy that URL in order to use it as argument to ciop-copy:
 
 .. code-block:: console
 
  cd
- ciop-copy -o ./ http://localhost/catalogue/sandbox/MER_RR__1P/MER_RR__1PRLRA20120407_112751_000026243113_00253_52853_0364.N1/rdf
+ ciop-copy -o ./ http://localhost/catalogue/sandbox/ASA_IMS_1P/ASA_IMS_1PNDPA20080326_204749_000000162067_00129_31746_3124.N1/rdf
  
 Once the download is completed, the MERIS product is available in your /home folder. The same strategy is adopted when copying a file from the storage in a run executable.
 

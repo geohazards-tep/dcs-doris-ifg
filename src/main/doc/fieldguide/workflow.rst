@@ -4,42 +4,40 @@ Workflow design
 Data
 ****
 
-You will use the Landsat 5&7 sample products made available by the `USGS <http://www.usgs.gov/>`_ at `<http://landsat.usgs.gov/product_samples.php>`_
+You will use the Envisat ASAR Image Mode Single Look Complex (ASA_IMS_1P) datasets over L'Aquila made available by `ESA <http://www.esa.int/>`_ on the Eo Virtual Archive 4 `<http://eo-virtual-archive4.esa.int/>`_
 
-The list of products used as test data is:
+The list of datasets used as test data is:
 
-* Landsat 5 TM
+* ASA_IMS_1PNDPA20070411_204750_000000162057_00129_26736_3123.N1
 
-  Acquired June 16, 1991: L5 TM 30-meter thermal - .tgz (175 MB)
+  Relative orbit 129, acquired April 4th, 2007 (532 MB) - used as slave 
 
-  Acquired June 27, 1995: L5 TM 30-meter thermal - .tgz (171 MB)
+* ASA_IMS_1PNDPA20080326_204749_000000162067_00129_31746_3124.N1
 
-* Landsat 7 ETM+
+  Relative orbit 129, acquired March 26th, 2008 (532 MB) - used as slave
+  
+* ASA_IMS_1PNDPA20090311_204746_000000162077_00129_36756_3125.N1
 
-  Acquired August 17, 1999: L7 ETM+ 30-meter thermal - .tgz (316 MB)
-
-  Acquired April 22, 2009: L7 ETM+ 30-meter thermal - .tgz (274 MB)
+  Relative orbit 129, acquired March 11th, 2009 (532 MB) - Scene acquired after the L'Aquila earthquake of April 6th 2009 and used as master
 
 Software and COTS
 *****************
 
-GDAL and GDAL Python
---------------------
+Doris and Adore
+---------------
 
-You will use GDAL [#f1]_ to:
+You will use Adore[#f1]_, the Automated Doris[#f2]_ Environment.
 
-* pre-process each of the Landsat sample products to convert from a multi GeoTIFF files to a single ERDAS .img product 
+The Delft Institute of Earth Observation and Space Systems of Delft University of Technology has developed an Interferometric Synthetic Aperture Radar (InSAR) processor named Doris (Delft object-oriented radar interferometric software).
 
-and GDAL Python libraries [#f2]_ to: 
-
-* implement a Python module to calculate the NDVI GeoTIFF 
+Doris is invoked using ADORE - Automated Doris Environment. Its development started at the University of Miami Geodesy Group, to help researchers generate interferograms with ease. Just like Doris it is an open source project and it comes with the same license. ADORE tries to provide a streamlined user interface for generating interferograms with DORIS and has some additional features for displaying and exporting the results, and time series analysis. 
 
 Workflow design
 ***************
 
 The application's data pipeline activities can be defined as follows:
 
-Use the Python NDVI package to apply the band arithmetic expression to calculate the NDVI to all Landsat products passed as references to the Sandbox catalogue.
+Use Adore (and Doris) to create two co-seismic interferograms sharing the same master.
 
 .. uml::
 
