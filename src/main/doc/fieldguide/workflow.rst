@@ -26,7 +26,7 @@ Software and COTS
 Doris and Adore
 ---------------
 
-You will use Adore[#f1]_, the Automated Doris[#f2]_ Environment.
+You will use Adore[#f1]_,  set of bash scripts to ease use of TU-DELFT's DORIS software [#f2]_.
 
 The Delft Institute of Earth Observation and Space Systems of Delft University of Technology has developed an Interferometric Synthetic Aperture Radar (InSAR) processor named Doris (Delft object-oriented radar interferometric software).
 
@@ -50,16 +50,21 @@ Use Adore (and Doris) to create two co-seismic interferograms sharing the same m
 
   start
   
+  :Stage-in master;
+  :Detect master mission;
+  :Create Environment;
+  
   while (check stdin?) is (line)
-    :Stage-in data;
-    :Apply Python NDVI;
-    :Stage-out ndvi_result;
-    :Register ndvi_result in Sandbox catalogue;
+    :Stage-in slave;
+    :Apply Adore script;
+    :Stage-out interferogram;
+    :Stage-out images;
+    :Stage-out logs;
   endwhile (empty)
 
   stop
 
-This translates into a very simple workflow containing a single processing step: py-ndvi 
+This translates into a very simple workflow containing a single processing step: node_adore
 
 The simple workflow can be represented as:
 
@@ -74,12 +79,12 @@ The simple workflow can be represented as:
 
   start
 
-  :node_ndvi;
+  :node_adore;
   
   stop
 
-The *node_ndvi* is described in details in :doc:`/field/vegetation/lib_python_ndvi/src/main/doc/fieldguide/nodes/index`
+The *node_adore* is described in details in :doc:`dcs-doris-ifg/src/main/doc/fieldguide/nodes/index`
 
-.. [#f1] `GDAL Geospatial Data Abstraction Library <http://www.gdal.org/>`_
+.. [#f1] `Adore-doris Automated DORIS Environment (adore) is a set of bash scripts to ease use of TU-DELFT's DORIS software<https://code.google.com/p/adore-doris/>`_
 
-.. [#f2] `GDAL Geospatial Data Abstraction Library Python package <https://pypi.python.org/pypi/GDAL/>`_
+.. [#f2] `DORIS Delft object-oriented radar interferometric software <http://doris.tudelft.nl/>`_

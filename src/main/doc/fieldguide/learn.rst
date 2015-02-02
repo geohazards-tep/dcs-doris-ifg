@@ -24,14 +24,14 @@ To deploy the application on a Developer Sandbox:
   
 This will build and deploy the application on the /application Developer Sandbox volume.
 
-The code can be modified by forking the repository here: `<https://github.com/Terradue/dcs-doris-ifg/fork>`_
+The code can be modified by forking the repository here: `<https://github.com/Terradue/dcs-doris-ifg/fork>`_ and sending us pull requests.
 
 Before going further, install the dependencies:
 
 .. code-block:: console
 
   sudo yum -y downgrade geos-3.3.2
-  sudo yum install -y adore-t2 snaphu  
+  sudo yum install -y adore-t2 snaphu sar-helpers
 
 Questions, bugs, and suggestions
 ++++++++++++++++++++++++++++++++

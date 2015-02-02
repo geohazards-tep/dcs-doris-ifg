@@ -18,11 +18,11 @@ A node requires a job template including:
 
 .. admonition:: Info 
 
-  The code for the whole application is available here: https://github.com/Terradue/dcs-python-ndvi
+  The code for the whole application is available here: https://github.com/Terradue/dcs-doris-ifg
 
 While this job template doesn't define any parameter, it defines the *mapred.task.timeout* property which is the wall-time in miliseconds between two logging entries.
 
 .. note::
 
-  Log entries using ciop-log function in bash (or rciop.log in R and cioopy.log in Python) tell the platform the process is alive. If the wall-time is reached the execution is terminated with an error
+  Log entries using ciop-log function in bash (or rciop.log in R and cioopy.log in Python) tell the platform the process is alive. If the wall-time is reached the execution is terminated with an error.
   
