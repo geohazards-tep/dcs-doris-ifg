@@ -36,7 +36,7 @@
       </defaultJobconf>
     </jobTemplate>
   </jobTemplates>
-  <workflow id="dcs-doris-ifg" title="Interferogram generation with ADORE DORIS" abstract="Interferogram generation with ADORE DORIS">
+  <workflow id="dcs-doris-ifg" title="ADORE DORIS interferometric processor" abstract="ADORE DORIS interferometric processor">
     <workflowVersion>1.0</workflowVersion>
     <node id="node_adore">
       <job id="adore" />
