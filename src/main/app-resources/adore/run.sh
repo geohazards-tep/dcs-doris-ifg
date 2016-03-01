@@ -147,7 +147,7 @@ get_data() {
   local enclosure
   local res
 
-  enclosure="$( opensearch-client  "${ref}" enclosure)"
+  enclosure="$( opensearch-client -f atom "${ref}" enclosure)"
   # opensearh client doesn't deal with local paths
   res=$?
   [ $res -eq 0 ] && [ -z "${enclosure}" ] && return ${ERR_GETDATA}
