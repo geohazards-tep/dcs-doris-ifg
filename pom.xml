@@ -5,10 +5,14 @@
 
 	<groupId>com.terradue.ciop.app</groupId>
 	<artifactId>dcs-doris-ifg</artifactId>
-	<packaging>rpm</packaging>
+	<packaging>pom</packaging>
 	<description>Interferogram dcs application using ADORE DORIS</description>
 	<version>1.4-SNAPSHOT</version>
-
+    <parent>
+        <groupId>com.terradue</groupId>
+        <artifactId>dcs-parent</artifactId>
+        <version>2.0.0</version>
+    </parent>
 	<scm>
 		<connection>scm:git:git@github.com:Terradue/dcs-doris-ifg.git</connection>
 		<developerConnection>scm:git:git@github.com:Terradue/dcs-doris-ifg.git</developerConnection>
@@ -16,12 +20,12 @@
 		<tag>HEAD</tag>
 	</scm>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.deploy.skip>true</maven.deploy.skip>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
 	<repositories>
 		<repository>
@@ -61,7 +65,19 @@
 					</filesets>
 				</configuration>
 			</plugin>
-
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>parse-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.6</version>
@@ -87,7 +103,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>rpm-maven-plugin</artifactId>
-				<version>2.1-alpha-4</version>
 				<extensions>true</extensions>
 				<configuration>
 					<copyright>${project.inceptionYear}, Terradue, GPL</copyright>
@@ -162,40 +177,23 @@
 					</execution>
 				</executions>
 			</plugin>
-                        <plugin>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>build-helper-maven-plugin</artifactId>
-                                <version>1.8</version>
-                                <executions>
-                                        <execution>
-                                                <id>parse-version</id>
-                                                <goals>
-                                                        <goal>parse-version</goal>
-                                                </goals>
-                                        </execution>
-                                </executions>
-                        </plugin>
-			<plugin>
-				<groupId>de.jutzig</groupId>
-				<artifactId>github-release-plugin</artifactId>
-				<version>1.1.1-dns</version>
-				<executions>
-					<execution>
-						<id>github-upload</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>release</goal>
-						</goals>
-						<inherited>false</inherited>
-						<configuration>
-							<releaseName>v${project.version}</releaseName>
-							<tag>v${project.version}</tag>
-							<artifact>${project.build.directory}/rpm/${project.artifactId}/RPMS/noarch/${project.artifactId}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}-ciop.noarch.rpm</artifact>
-							<overwriteArtifact>true</overwriteArtifact>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-gitexe</artifactId>
+                        <version>1.9</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.terradue</groupId>
+                <artifactId>rpmdeploy-maven-plugin</artifactId>
+                <version>1.2</version>
+            </plugin>
 		</plugins>
 	</build>
 
