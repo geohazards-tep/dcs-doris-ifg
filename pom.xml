@@ -75,7 +75,7 @@
                                         <directory>/application/application.xml</directory>
                                         <sources>
                                             <source>
-                                                <location>${basedir}/src/main/app-resources/application${mission}.xml</location>
+                                                <location>${basedir}/src/main/app-resources/application.xml</location>
                                             </source>
                                         </sources>
                                     </mapping>
