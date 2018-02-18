@@ -5,7 +5,7 @@
   <artifactId>dcs-doris-ifg</artifactId>
   <packaging>pom</packaging>
   <description>Interferogram dcs application using ADORE DORIS</description>
-  <version>1.4</version>
+  <version>1.4.1-SNAPSHOT</version>
   <parent>
     <groupId>com.terradue</groupId>
     <artifactId>dcs-bash-parent</artifactId>
