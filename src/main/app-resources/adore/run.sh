@@ -185,7 +185,7 @@ main() {
   master_ref="$( ciop-getparam master )"
   slave_ref="$1"
 
-  ciop-log "INFO" "Retrieving master"  
+  ciop-log "INFO" "Retrieving master ${master_ref} ${TMPDIR}"  
   master=$( get_data ${master_ref} ${TMPDIR} )
   [ $? -ne 0 ] && return ${ERR_MASTER}
 
