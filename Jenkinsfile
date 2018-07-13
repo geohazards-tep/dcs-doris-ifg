@@ -21,7 +21,7 @@ pipeline {
         
         // See Jenkins's "Global Tool Configuration"
         withMaven( maven: 'apache-maven-3.0.5' ) {
-            sh 'mvn -B deploy'
+            sh 'mvn -X -B deploy'
         }
 
       }
