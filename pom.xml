@@ -65,7 +65,7 @@
                   <goal>rpm</goal>
                 </goals>
                 <configuration>
-                  <!-- <mappings combine.children="append">
+                  <mappings combine.children="append">
                     <mapping>
                       <directory>/application/application.xml</directory>
                       <sources>
@@ -74,7 +74,7 @@
                         </source>
                       </sources>
                     </mapping>
-                  </mappings> -->
+                  </mappings>
                   <!-- Set here the dependencies installed with 'sudo yum install'-->
                   <requires>
                     <require>adore-t2</require>
