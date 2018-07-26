@@ -65,7 +65,7 @@
                   <goal>rpm</goal>
                 </goals>
                 <configuration>
-                  <mappings combine.children="append">
+                  <mappings >
                     <mapping>
                       <directory>/application/application.xml</directory>
                       <sources>
