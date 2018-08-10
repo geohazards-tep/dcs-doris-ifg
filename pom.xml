@@ -81,6 +81,7 @@
 -->
                   <!-- Set here the dependencies installed with 'sudo yum install'-->
                   <requires>
+				   <require>wget</require>
                     <require>adore-t2</require>
                     <require>snaphu</require>
                     <require>python-lxml</require>
