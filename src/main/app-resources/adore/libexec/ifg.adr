@@ -18,6 +18,9 @@ function assert() {
  return ${retval}
 }
 
+
+set -x
+
 steps=${1}
 mission=${2}
 
