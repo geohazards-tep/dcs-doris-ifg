@@ -217,10 +217,10 @@ main() {
   [ $? -ne 0 ] && return ${ERR_ADORE}
 
 
-dirResVal=$(basename $TMPDIR)
-hdfs dfs -mkdir -p ${nameNode}/ciop/run/${CIOP_WF_RUN_ID}/_results/${dirResVal}
-hdfs dfs -chmod 777 ${nameNode}/ciop/run/${CIOP_WF_RUN_ID}/_results
-hdfs dfs -chmod 777 ${nameNode}/ciop/run/${CIOP_WF_RUN_ID}/_results/${dirResVal}
+#dirResVal=$(basename $TMPDIR)
+#hdfs dfs -mkdir -p ${nameNode}/ciop/run/${CIOP_WF_RUN_ID}/_results/${dirResVal}
+#hdfs dfs -chmod 777 ${nameNode}/ciop/run/${CIOP_WF_RUN_ID}/_results
+#hdfs dfs -chmod 777 ${nameNode}/ciop/run/${CIOP_WF_RUN_ID}/_results/${dirResVal}
 
 
   publish_result int || return $?
